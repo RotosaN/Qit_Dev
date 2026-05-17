@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Qit</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+    <script>
+        (function (d) {
+            var config = {
+                kitId: "gti2pui",
+                scriptTimeout: 3000,
+                async: true,
+            },
+                h = d.documentElement,
+                t = setTimeout(function () {
+                    h.className =
+                        h.className.replace(/\bwf-loading\b/g, "") + " wf-inactive";
+                }, config.scriptTimeout),
+                tk = d.createElement("script"),
+                f = false,
+                s = d.getElementsByTagName("script")[0],
+                a;
+            h.className += " wf-loading";
+            tk.src = "https://use.typekit.net/" + config.kitId + ".js";
+            tk.async = true;
+            tk.onload = tk.onreadystatechange = function () {
+                a = this.readyState;
+                if (f || (a && a != "complete" && a != "loaded")) return;
+                f = true;
+                clearTimeout(t);
+                try {
+                    Typekit.load(config);
+                } catch (e) { }
+            };
+            s.parentNode.insertBefore(tk, s);
+        })(document);
+    </script>
+</head>
+
+<body>
+    <div id="nameInputModal" class="modalOverlay">
+        <div class="modalContent">
+            <h3>ENTRY</h3>
+            <p>名前を入力してください</p>
+
+            <div class="inputGroup">
+                <input type="text" id="playerNameInput" placeholder="" maxlength="10">
+            </div>
+
+            <button id="entrySubmitBtn" class="btn">参加する</button>
+        </div>
+    </div>
+    <div class="main">
+        <div class="contentWrapper">
+            <div id="gameScreen">
+                <div class="topObj">
+                    <div id="topInfo">
+                        <div class="infoSide">
+                            <p class="label">問題数</p>
+                            <p class="data">
+                                <span id="currentQ">1</span><span id="Qslash"> / </span><span id="totalQ">10</span>
+                            </p>
+                        </div>
+
+                        <div class="infoCenter">
+                            <div class="question-box">
+                                <p id="questionText">
+                                    <span id="qHead">Q.
+                                    </span>
+                                </p>
+                                <p id="answerText">
+                                    <span id="ansHead">ANS. </span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="infoSide">
+                            <p class="label">ルール</p>
+                            <p id="ruleDisplay" class="data">7○3×</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mainObj">
+                    <!-- <object data="img/ox.svg" type="image/svg+xml" class="player"></object> -->
+                </div>
+                <div class="buzzerArea">
+                    <div class="buttonObj">
+                    <object data="img/button_3d.svg" type="image/svg+xml" class="buzzerBtn"></object>
+                    <span class="keybind">Space</span><span class="keybind">Enter</span>で早押し
+                    </div>
+                </div>
+            </div>
+            <div id="settingsScreen">
+                <div id="settingContent">
+                    <h3 id="settingTitle">SETTINGS</h3>
+                    <p class="configLabel">部屋の設定 <span class="settingLabelEng">ROOM CONFIG</span></p>
+                    <!-- <div class="settingItem">
+                        <p class="settingLabel">誤答時にフリーズする</p>
+                        <label class="settingToggle">
+                            <input type="checkbox" id="checkFreeze">
+                        </label>
+                    </div> -->
+
+                    <div class="settingItem">
+                        <p class="settingLabel">部屋の名前</p>
+                        <div class="settingInput">
+                            <input id="roomName">
+                        </div>
+                    </div>
+
+                    <div class="settingItem">
+                        <p class="settingLabel">ルームID</p>
+                        <div id="roomID"><span roomidText>00000</span>  <span><img src="img/content_copy_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.svg" onclick="copy()"></span></div>
+                    </div>
+
+                    <p class="configLabel">ゲームルール <span class="settingLabelEng">GAME RULE</span></p>
+                    <div class="customSelect">
+                        <div class="selected">
+                            N○M×
+                        </div>
+                        <div class="options">
+                            <div class="option selectedOption" data-value="single">
+                                N○M×
+                            </div>
+                            <div class="option" data-value="endless">
+                                N+/M-
+                            </div>
+                            <div class="option" data-value="endless">
+                                カスタム
+                            </div>
+                        </div>
+                        <input type="hidden" id="ruleType" value="single">
+                    </div>
+
+                    <hr>
+
+                    <p class="configLabel">得点形式 <span class="settingLabelEng">ANSWER RULE</span></p>
+                    <div class="customSelect">
+                        <div class="selected">
+                            1
+                        </div>
+                        <div class="options">
+                            <div class="option selectedOption" data-value="te1">
+                                2
+                            </div>
+                            <div class="option" data-value="te2">
+                                3
+                            </div>
+                        </div>
+                        <input type="hidden" id="ruleType1" value="te1">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="script.js"  type="module"></script>
+
+</html>

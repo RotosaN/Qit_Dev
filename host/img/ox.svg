@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_レイヤー_1" data-name="レイヤー 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 226.93 333.9">
+  <defs>
+    <style>
+
+      @font-face {
+        font-family: 'GenMid';
+        src: url('../../media/font/GenInterfaceJP-Medium.woff') format('woff');
+      }
+
+      .cls-1 {
+        fill: #ffd400;
+        font-family: "GenMid";
+        font-size: 43.13px;
+      }
+
+      .cls-1, .cls-2, .cls-3 {
+        font-weight: 700;
+      }
+
+      .cls-4 {
+        fill: #c1c1c1;
+      }
+
+      .cls-5 {
+        fill: #2d2c2c;
+      }
+
+      .cls-6 {
+        fill: #ddd;
+      }
+
+      .cls-7 {
+        fill: #fff;
+      }
+
+      .cls-2 {
+        font-family: GenMid;
+        font-size: 55px;
+      }
+
+      .cls-8 {
+        fill: #282828;
+      }
+
+      .cls-9 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-10 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-11 {
+        fill: #191919;
+      }
+
+      .lamp {
+        fill: #ff4a4a;
+        filter: brightness(0.3)
+      }
+
+      .cls-3 {
+        font-family: "GenMid";
+        font-size: 24.63px;
+      }
+
+      .cls-13 {
+        fill: #e23737;
+      }
+
+    @keyframes blinking {
+      0%, 41.7% {
+        filter: brightness(0.3)
+      }
+      50% {
+        filter: brightness(1)
+      }
+      91.7% {
+        filter: brightness(1)
+      }
+      100% {
+        filter: brightness(0.3)
+      }
+    }
+
+    .blink {
+      animation: blinking 1.0s linear infinite;
+    }
+    </style>
+  </defs>
+  <path class="cls-7"
+    d="M30.11,81.75h196.82v222.03c0,16.62-13.49,30.11-30.11,30.11H30.11c-16.62,0-30.11-13.49-30.11-30.11V111.87c0-16.62,13.49-30.11,30.11-30.11Z" />
+  <text class="cls-3 playerName" transform="translate(113.465 148.69)" text-anchor="middle"
+    id="playerName">TESTPLAYER</text>
+  <g>
+    <text class="cls-2" transform="translate(67.465 278.93)" text-anchor="middle">0</text>
+    <path class="cls-4"
+      d="M68.83,175.09c-7.86,0-14.23,6.37-14.23,14.23s6.37,14.23,14.23,14.23,14.23-6.37,14.23-14.23-6.37-14.23-14.23-14.23ZM68.83,199.51c-5.63,0-10.2-4.57-10.2-10.2s4.57-10.2,10.2-10.2,10.2,4.57,10.2,10.2-4.57,10.2-10.2,10.2Z" />
+    <polygon class="cls-4"
+      points="170.51 179.43 167.41 176.33 158.1 185.64 148.79 176.33 145.69 179.43 155 188.74 145.69 198.05 148.79 201.15 158.1 191.84 167.41 201.15 170.51 198.05 161.2 188.74 170.51 179.43" />
+    <text class="cls-2" transform="translate(159.465 278.93)" text-anchor="middle">0</text>
+  </g>
+  <path class="cls-5" d="M191.13,47.97h33.14c1.47,0,2.67,1.19,2.67,2.67v31.12h-35.8v-33.78h0Z" />
+  <path class="cls-11" d="M120.41,47.91h70.72v33.78h-77.66v-26.84c0-3.83,3.11-6.94,6.94-6.94Z" />
+  <path class="lamp"
+    d="M180.79,9.32h11.82c6.23,0,11.29,5.06,11.29,11.29v27.32h-34.4v-27.32c0-6.23,5.06-11.29,11.29-11.29Z" />
+    <path class="cls-6"
+    d="M168.43,39.44h36.53c.91,0,1.66.74,1.66,1.66v6.84h-39.85v-6.84c0-.91.74-1.66,1.66-1.66Z" />
+  <rect class="cls-8" x="132.45" y="34.36" width="3.37" height="13.61" />
+  <rect class="cls-13" x="130.41" y="33.95" width="7.45" height="9.23" rx=".78" ry=".78" />
+  <text class="cls-1 slashNum" transform="translate(21.67 81.75)"></text>
+</svg>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_レイヤー_1" data-name="レイヤー 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1719.61 177.63">
+  <defs>
+    <style>
+      .cls-1 {
+        font-size: 30.61px;
+      }
+
+      .cls-1, .cls-2, .cls-3, .cls-4, .cls-5, .cls-6, .cls-7 {
+        font-weight: 700;
+      }
+
+      .cls-1, .cls-2, .cls-4 {
+        font-family: ShinMGoPr6-DeBold-83pv-RKSJ-H, 'A-OTF Shin Maru Go Pr6';
+      }
+
+      .cls-2, .cls-4 {
+        font-size: 21.66px;
+      }
+
+      .cls-8 {
+        fill: none;
+        stroke: #afafaf;
+        stroke-miterlimit: 10;
+        stroke-width: 4px;
+      }
+
+      .cls-3 {
+        font-size: 59.89px;
+      }
+
+      .cls-3, .cls-5, .cls-6 {
+        font-family: Futura-CondensedExtraBold, Futura;
+      }
+
+      .cls-9 {
+        fill: #fff;
+      }
+
+      .cls-4 {
+        fill: #969696;
+      }
+
+      .cls-5 {
+        fill: #afafaf;
+        font-size: 39.67px;
+      }
+
+      .cls-10 {
+        letter-spacing: -.07em;
+      }
+
+      .cls-6 {
+        font-size: 47.04px;
+      }
+
+      .cls-7 {
+        font-family: Futura-Bold, Futura;
+        font-size: 39.38px;
+      }
+    </style>
+  </defs>
+  <rect class="cls-9" width="1463.06" height="177.63" rx="15" ry="15"/>
+  <text class="cls-5" transform="translate(74.07 127.25)"><tspan x="0" y="0">30</tspan></text>
+  <line class="cls-8" x1="43.92" y1="126.13" x2="103.13" y2="66.93"/>
+  <text class="cls-3" transform="translate(36.94 90.14)"><tspan x="0" y="0">1</tspan></text>
+  <g>
+    <text class="cls-1" transform="translate(241.85 47)"><tspan x="0" y="0">テストもんだい文</tspan></text>
+    <text class="cls-7" transform="translate(165.58 49.63)"><tspan x="0" y="0">Q</tspan></text>
+    <text class="cls-1" transform="translate(241.85 145.56)"><tspan x="0" y="0">答え</tspan></text>
+    <text class="cls-7" transform="translate(168.01 148.85)"><tspan x="0" y="0">A</tspan></text>
+  </g>
+  <rect class="cls-9" x="1480.51" width="239.1" height="177.63" rx="15" ry="15"/>
+  <g>
+    <g>
+      <path d="M1585.43,68.4c-11.27,0-20.41,9.14-20.41,20.41s9.14,20.41,20.41,20.41,20.41-9.14,20.41-20.41-9.14-20.41-20.41-20.41ZM1585.43,103.45c-8.08,0-14.63-6.55-14.63-14.63s6.55-14.63,14.63-14.63,14.63,6.55,14.63,14.63-6.55,14.63-14.63,14.63Z"/>
+      <text class="cls-6" transform="translate(1503.64 107.7)"><tspan class="cls-10" x="0" y="0">1</tspan><tspan x="25.19" y="0">2</tspan></text>
+    </g>
+    <g>
+      <polygon points="1695.58 77.14 1691.17 72.74 1677.93 85.98 1664.69 72.74 1660.29 77.14 1673.53 90.38 1660.29 103.62 1664.69 108.03 1677.93 94.79 1691.17 108.03 1695.58 103.62 1682.34 90.38 1695.58 77.14"/>
+      <text class="cls-6" transform="translate(1621.34 107.7)"><tspan x="0" y="0">6</tspan></text>
+    </g>
+  </g>
+  <text class="cls-4" transform="translate(1496 33.33)"><tspan x="0" y="0">勝ち抜け・失格</tspan></text>
+  <text class="cls-2" transform="translate(1523.11 155.58)"><tspan x="0" y="0">BlueBird 決勝</tspan></text>
+</svg>
