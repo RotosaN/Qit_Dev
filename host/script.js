@@ -106,7 +106,7 @@ entrySubmitBtn.addEventListener("click", () => {
 
     const savedPlayerId = localStorage.getItem("qitPlayerUUID")
     if (!savedPlayerId) {
-        uuid = self.crypto.randomUUID()
+        const uuid = self.crypto.randomUUID()
         localStorage.setItem("qitPlayerUUID", uuid)
     }
 
@@ -124,7 +124,8 @@ entrySubmitBtn.addEventListener("click", () => {
         freeze: 0,
         isPushing: false,
         pushedAt: 0,
-        isHost: false
+        isHost: false,
+        rank: 0
     }
 
     setPlayerData()
@@ -142,80 +143,133 @@ playerNameInput.addEventListener("keypress", (e) => {
 })
 
 function copy() {
-    var targetCode = document.getElementById("roomidText")
+    const targetCode = document.getElementById("roomidText")
     navigator.clipboard.writeText(targetCode)
     alert("コピーしました！")
 }
 
+let playedAnsSound = false;
+
 onValue(ref(db, "rooms/43143/player"), (snapshot) => {
-    setPlayerData()
-    console.log(`a`)
-})
+    const playersData = snapshot.val();
+    if (!playersData) return;
 
+    setPlayerData(playersData);
 
-function setPlayerData() {
+    const hasRankOne = Object.values(playersData).some(player => player.rank == 1);
 
-    get(ref(db, "rooms/43143/player")).then((snapshot) => {
-        const playersData = snapshot.val()
-        if (!playersData) return
-        console.log(playersData)
+    if (hasRankOne) {
+        if (!playedAnsSound) {
+            ansSound.currentTime = 0;
+            ansSound.play();
+            playedAnsSound = true;
+        }
+    } else {
+        playedAnsSound = false;
+    }
+});
 
-        const mainObjContainer = document.querySelector('.mainObj')
+function setPlayerData(playersData) {
+    const mainObjContainer = document.querySelector('.mainObj');
+    if (!mainObjContainer || !playersData) return;
 
-        console.log(playersData)
+    Object.entries(playersData).forEach(([playerId, player]) => {
+        let svgObj = mainObjContainer.querySelector(`[data-id="${playerId}"]`);
 
-        const playerData = Object.entries(playersData)
+        if (svgObj) {
+            const svgDoc = svgObj.getSVGDocument();
+            if (svgDoc) updatePlayerSvg(svgDoc, playerId, player);
+        } else {
+            svgObj = document.createElement('object');
+            svgObj.setAttribute('data', 'img/ox.svg');
+            svgObj.setAttribute('type', 'image/svg+xml');
+            svgObj.classList.add('player');
+            svgObj.dataset.id = playerId;
+            mainObjContainer.appendChild(svgObj);
 
-        Object.entries(playersData).forEach(([playerId, player]) => {
-
-            let svgObj = mainObjContainer.querySelector(`[data-id="${playerId}"]`);
-
-            if (svgObj) {
-                const svgDoc = svgObj.getSVGDocument()
-                updatePlayerSvg(svgDoc, playerId, player)
-            } else {
-                svgObj = document.createElement('object')
-                svgObj.setAttribute('data', 'img/ox.svg')
-                svgObj.setAttribute('type', 'image/svg+xml')
-                svgObj.setAttribute('data-id', localStorage.getItem("qitPlayerUUID"))
-                svgObj.classList.add('player')
-                svgObj.dataset.id = playerId
-                mainObjContainer.appendChild(svgObj)
-
-                console.log(player)
-
-                svgObj.addEventListener('load', () => {
-                    const svgDoc = svgObj.getSVGDocument()
-                    updatePlayerSvg(svgDoc, playerId, player)
-                })
-            }
-
-        })
-    })
+            svgObj.addEventListener('load', () => {
+                const svgDoc = svgObj.getSVGDocument();
+                if (svgDoc) updatePlayerSvg(svgDoc, playerId, player);
+            });
+        }
+    });
 }
 
+document.addEventListener('DOMContentLoaded', (event) => {
+    const roomidtext = document.getElementById('roomidText');
+    roomidtext.textContent = roomId
+});
+
 function updatePlayerSvg(svgDoc, playerId, player) {
-    const playerNameObj = svgDoc.getElementById('playerName')
-    playerNameObj.textContent = player.name
+    const playerNameObj = svgDoc.getElementById('playerName');
+    if (playerNameObj) playerNameObj.textContent = player.name;
+
+    const slashNum = svgDoc.getElementById('slashNum');
+    const lamplit = svgDoc.getElementById('lamp');
+
+    if (player.rank != 0) {
+        const rankColor = ["#edc500", "#939393", "#c97c2a", "#282828"];
+        if (slashNum) {
+            slashNum.setAttribute("fill", rankColor[Math.min(player.rank - 1, 3)]);
+            slashNum.textContent = getOrdinal(player.rank);
+        }
+
+        if (player.rank == 1 && lamplit) {
+            lamplit.classList.add("blink");
+        }
+    } else {
+        if (slashNum) slashNum.textContent = "";
+        if (lamplit) lamplit.classList.remove("blink");
+    }
+}
+function getOrdinal(n) {
+    const s = ["th", "st", "nd", "rd"],
+        v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
 
 
 window.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' && event.target.tagName !== 'INPUT') {
-        
-        ansSound.currentTime = 0;
-        ansSound.play()
+
+        if (isSubmitting) return
 
         const playerRef = ref(db, `rooms/${roomId}/player/${localStorage.getItem("qitPlayerUUID")}`)
 
         update(playerRef, {
             isPushing: true,
             pushedAt: serverTimestamp()
-        }).then(() => {
-            console.log("早押しボタンが押されました！")
-        }).catch((error) => {
-            console.error("送信失敗:", error)
+        })
+    }
+
+    if (event.key === 'o' && event.target.tagName !== 'INPUT') {
+        correctSound.currentTime = 0;
+        correctSound.play();
+        get(ref(db, `rooms/${roomId}/player`)).then((snapshot) => {
+            const playersData = snapshot.val();
+            if (!playersData) return;
+            Object.keys(playersData).forEach((playerId) => {
+                update(ref(db, `rooms/${roomId}/player/${playerId}`), {
+                    rank: 0,
+                    isPushing: false
+                });
+            });
+        })
+    }
+
+    if (event.key === 'x' && event.target.tagName !== 'INPUT') {
+        wrongSound.currentTime = 0;
+        wrongSound.play();
+        get(ref(db, `rooms/${roomId}/player`)).then((snapshot) => {
+            const playersData = snapshot.val();
+            if (!playersData) return;
+            Object.keys(playersData).forEach((playerId) => {
+                update(ref(db, `rooms/${roomId}/player/${playerId}`), {
+                    rank: 0,
+                    isPushing: false
+                });
+            });
         })
     }
 })

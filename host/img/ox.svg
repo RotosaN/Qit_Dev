@@ -9,7 +9,6 @@
       }
 
       .cls-1 {
-        fill: #ffd400;
         font-family: "GenMid";
         font-size: 43.13px;
       }
@@ -103,11 +102,11 @@
   </g>
   <path class="cls-5" d="M191.13,47.97h33.14c1.47,0,2.67,1.19,2.67,2.67v31.12h-35.8v-33.78h0Z" />
   <path class="cls-11" d="M120.41,47.91h70.72v33.78h-77.66v-26.84c0-3.83,3.11-6.94,6.94-6.94Z" />
-  <path class="lamp"
+  <path class="lamp" id="lamp"
     d="M180.79,9.32h11.82c6.23,0,11.29,5.06,11.29,11.29v27.32h-34.4v-27.32c0-6.23,5.06-11.29,11.29-11.29Z" />
     <path class="cls-6"
     d="M168.43,39.44h36.53c.91,0,1.66.74,1.66,1.66v6.84h-39.85v-6.84c0-.91.74-1.66,1.66-1.66Z" />
   <rect class="cls-8" x="132.45" y="34.36" width="3.37" height="13.61" />
   <rect class="cls-13" x="130.41" y="33.95" width="7.45" height="9.23" rx=".78" ry=".78" />
-  <text class="cls-1 slashNum" transform="translate(21.67 81.75)"></text>
+  <text class="cls-1" id="slashNum" transform="translate(21.67 81.75)" fill="#edc500"></text>
 </svg>

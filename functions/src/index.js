@@ -24,13 +24,10 @@ exports.checkBuzzer = onValueUpdated({ region: "asia-southeast1", ref: "/rooms/{
 
         if (!players) return players;
 
+        const ansPlayerCount = Object.values(players).filter(player => player.rank != 0).length
 
-        const isAlreadyAnswered = Object.values(players).some(p => p.rank === 1);
-
-        if (!isAlreadyAnswered) {
-            if (players[playerId]) {
-                players[playerId].rank = 1;
-            }
+        if (players[playerId]) {
+            players[playerId].rank = ansPlayerCount + 1;
         }
 
         return players;
