@@ -128,6 +128,8 @@ entrySubmitBtn.addEventListener("click", () => {
         rank: 0
     }
 
+    console.log("initital")
+
     setPlayerData()
 
     try {
@@ -145,7 +147,6 @@ playerNameInput.addEventListener("keypress", (e) => {
 function copy() {
     const targetCode = document.getElementById("roomidText")
     navigator.clipboard.writeText(targetCode)
-    alert("コピーしました！")
 }
 
 let playedAnsSound = false;
@@ -233,7 +234,7 @@ function getOrdinal(n) {
 window.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' && event.target.tagName !== 'INPUT') {
 
-        if (isSubmitting) return
+        //if (isSubmitting) return
 
         const playerRef = ref(db, `rooms/${roomId}/player/${localStorage.getItem("qitPlayerUUID")}`)
 

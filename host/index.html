@@ -76,7 +76,6 @@
                                 </p>
                             </div>
                         </div>
-
                         <div class="infoSide">
                             <p class="label">ルール</p>
                             <p id="ruleDisplay" class="data">7○3×</p>
@@ -107,7 +106,7 @@
                     <div class="settingItem">
                         <p class="settingLabel">部屋の名前</p>
                         <div class="settingInput">
-                            <input id="roomName">
+                            <input id="roomName" style="--inputBoxWidth:150px">
                         </div>
                     </div>
 
@@ -135,22 +134,27 @@
                         <input type="hidden" id="ruleType" value="single">
                     </div>
 
-                    <hr>
+                    <br>
 
-                    <p class="configLabel">得点形式 <span class="settingLabelEng">ANSWER RULE</span></p>
-                    <div class="customSelect">
-                        <div class="selected">
-                            1
+                    <div class="settingItem-left">
+                        <div class="settingInput" style="--inputBoxWidth:100px">
+                            <input id="roomName">
                         </div>
-                        <div class="options">
-                            <div class="option selectedOption" data-value="te1">
-                                2
-                            </div>
-                            <div class="option" data-value="te2">
-                                3
-                            </div>
+                        <p class="settingLabel">問正解で勝ち抜け</p>
+                    </div>
+
+                    <div class="settingItem-left">
+                        <div class="settingInput">
+                            <input id="roomName" style="--inputBoxWidth:100px">
                         </div>
-                        <input type="hidden" id="ruleType1" value="te1">
+                        <p class="settingLabel">問誤答で失格</p>
+                    </div>
+
+                    <div class="settingItem">
+                        <p class="settingLabel">誤答判定後にボタンをリセットする</p>
+                        <label class="settingToggle">
+                            <input type="checkbox" id="checkFreeze">
+                        </label>
                     </div>
                 </div>
             </div>
