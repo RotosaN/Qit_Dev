@@ -16,23 +16,7 @@ exports.checkBuzzer = onValueUpdated({
     if (!afterData || afterData.isPushing !== true) return null;
     if (beforeData && beforeData.isPushing === true) return null;
     if (afterData.rank !== 0) return null;
-
-    if (!afterData || afterData.isPushing !== true) {
-        return null;
-    }
-
-    if (beforeData && beforeData.isPushing === true) {
-        return null;
-    }
-
-    if (afterData.rank !== 0) {
-        return null;
-    }
-
-    if(beforeData.isLost) {
-        return null;
-    }
-
+    if (beforeData && beforeData.isLost) return null;
 
     const roomPlayersRef = db.ref(`rooms/${roomId}/player`);
 
@@ -67,39 +51,38 @@ exports.onHostAction = onValueUpdated({
 
     const { action, targetPlayerId } = actionData;
 
-
     if (action === "correct" && targetPlayerId && targetPlayerId !== "none") {
         const playerRef = db.ref(`rooms/${roomId}/player/${targetPlayerId}`);
-        const ruleData = (await db.ref(`rooms/${roomId}/roomRule`).get()).val();
+        const ruleSnapshot = await db.ref(`rooms/${roomId}/roomRule`).get();
+        const ruleData = ruleSnapshot.exists() ? ruleSnapshot.val() : null;
+
         await playerRef.transaction((player) => {
             if (!player) return player;
 
-            if(ruleData.rule == "ox"){
+            if (ruleData && ruleData.rule == "ox") {
                 player.o = (player.o || 0) + 1;
-                if(ruleData.lostO <= player.o){
-                    player.isWin = true
+                if (ruleData.lostO <= player.o) {
+                    player.isWin = true;
                 }
             }
-
-
             return player;
         });
     } 
 
     else if (action === "wrong" && targetPlayerId && targetPlayerId !== "none") {
         const playerRef = db.ref(`rooms/${roomId}/player/${targetPlayerId}`);
-        const ruleData = (await db.ref(`rooms/${roomId}/roomRule`).get()).val();
+        const ruleSnapshot = await db.ref(`rooms/${roomId}/roomRule`).get();
+        const ruleData = ruleSnapshot.exists() ? ruleSnapshot.val() : null;
+
         await playerRef.transaction((player) => {
             if (!player) return player;
 
-            if(ruleData.rule == "ox"){
+            if (ruleData && ruleData.rule == "ox") {
                 player.x = (player.x || 0) + 1;
-                if(ruleData.lostX <= player.x){
-                    player.isLost = true
+                if (ruleData.lostX <= player.x) {
+                    player.isLost = true;
                 }
             }
-
-
             return player;
         });
     }
