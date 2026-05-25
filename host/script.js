@@ -125,7 +125,7 @@ entrySubmitBtn.addEventListener("click", () => {
         isPushing: false,
         pushedAt: 0,
         isHost: false,
-        rank: 0
+        rank: 0,
     }
 
     console.log("initital")
@@ -150,6 +150,41 @@ function copy() {
 }
 
 let playedAnsSound = false;
+
+
+
+let lastPlayedActionId = "";
+
+onValue(ref(db, `rooms/${roomId}/hostAction`), (snapshot) => {
+    const hostData = snapshot.val();
+    if (!hostData || !hostData.timestamp) return; 
+
+    const currentActionId = `${hostData.action}_${hostData.timestamp}`;
+    if (lastPlayedActionId === currentActionId) {
+        return; 
+    }
+
+    if (hostData.action === "wrong") {
+        console.log("★本当のWrong検知");
+        lastPlayedActionId = currentActionId;
+        
+        wrongSound.currentTime = 0;
+        wrongSound.play()
+            .then(() => console.log("🔊 Wrongサウンドの再生に成功しました！"))
+            .catch(e => console.error("❌ Wrongサウンドの再生に失敗:", e));
+    }
+
+    if (hostData.action === "correct") {
+        console.log("★本当のCorrect検知");
+        lastPlayedActionId = currentActionId;
+        
+        correctSound.currentTime = 0;
+        correctSound.play()
+            .then(() => console.log("🔊 Correctサウンドの再生に成功しました！"))
+            .catch(e => console.error("❌ Correctサウンドの再生に失敗:", e));
+    }
+});
+
 
 onValue(ref(db, "rooms/43143/player"), (snapshot) => {
     const playersData = snapshot.val();
@@ -233,11 +268,7 @@ function getOrdinal(n) {
 
 window.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' && event.target.tagName !== 'INPUT') {
-
-        //if (isSubmitting) return
-
         const playerRef = ref(db, `rooms/${roomId}/player/${localStorage.getItem("qitPlayerUUID")}`)
-
         update(playerRef, {
             isPushing: true,
             pushedAt: serverTimestamp()
@@ -245,32 +276,104 @@ window.addEventListener('keydown', (event) => {
     }
 
     if (event.key === 'o' && event.target.tagName !== 'INPUT') {
-        correctSound.currentTime = 0;
-        correctSound.play();
-        get(ref(db, `rooms/${roomId}/player`)).then((snapshot) => {
-            const playersData = snapshot.val();
-            if (!playersData) return;
-            Object.keys(playersData).forEach((playerId) => {
-                update(ref(db, `rooms/${roomId}/player/${playerId}`), {
-                    rank: 0,
-                    isPushing: false
-                });
-            });
+        const playerRef = ref(db, `rooms/${roomId}/player/${localStorage.getItem("qitPlayerUUID")}`)
+        update(playerRef, {
+            isPushing: true,
+            pushedAt: serverTimestamp()
         })
     }
 
     if (event.key === 'x' && event.target.tagName !== 'INPUT') {
-        wrongSound.currentTime = 0;
-        wrongSound.play();
-        get(ref(db, `rooms/${roomId}/player`)).then((snapshot) => {
-            const playersData = snapshot.val();
-            if (!playersData) return;
-            Object.keys(playersData).forEach((playerId) => {
-                update(ref(db, `rooms/${roomId}/player/${playerId}`), {
-                    rank: 0,
-                    isPushing: false
-                });
-            });
+        const playerRef = ref(db, `rooms/${roomId}/player/${localStorage.getItem("qitPlayerUUID")}`)
+        update(playerRef, {
+            isPushing: true,
+            pushedAt: serverTimestamp()
         })
     }
 })
+
+
+
+
+let currentPlayersData = {};
+
+onValue(ref(db, `rooms/${roomId}/player`), (snapshot) => {
+    const playersData = snapshot.val();
+    if (!playersData) return;
+
+    currentPlayersData = playersData; 
+    setPlayerData(playersData);
+
+    const hasRankOne = Object.values(playersData).some(player => player.rank == 1);
+
+    if (hasRankOne) {
+        if (!playedAnsSound) {
+            ansSound.currentTime = 0;
+            ansSound.play();
+            playedAnsSound = true;
+        }
+    } else {
+        playedAnsSound = false;
+    }
+});
+
+let isSubmitting = false;
+
+window.addEventListener('keydown', (event) => {
+    const myId = localStorage.getItem("qitPlayerUUID");
+    if (!myId || !currentPlayersData[myId]) return;
+
+    if (currentPlayersData[myId].rank !== 0) {
+        return; 
+    }
+
+    if (event.key === 'Enter' && event.target.tagName !== 'INPUT') {
+        if (isSubmitting) return;
+        isSubmitting = true;
+
+        const playerRef = ref(db, `rooms/${roomId}/player/${myId}`);
+        update(playerRef, {
+            isPushing: true,
+            pushedAt: serverTimestamp()
+        }).then(() => {
+            setTimeout(() => { isSubmitting = false; }, 1000);
+        }).catch(() => {
+            isSubmitting = false;
+        });
+    }
+});
+
+$(document).on("click", ".correctButton, .wrongButton, .throughButton", function() {
+    const activePlayerId = Object.keys(currentPlayersData).find(
+        id => currentPlayersData[id] && currentPlayersData[id].rank === 1
+    );
+
+    let actionType = "";
+    if ($(this).hasClass("correctButton")) actionType = "correct";
+    if ($(this).hasClass("wrongButton")) actionType = "wrong";
+    if ($(this).hasClass("throughButton")) actionType = "through";
+
+    if (actionType !== "through" && !activePlayerId) {
+        alert("現在、解答権を持っている（1stの）プレイヤーがいません。");
+        return;
+    }
+
+    let myHostToken = localStorage.getItem(`qitHostToken_${roomId}`);
+    if (!myHostToken) {
+        myHostToken = self.crypto.randomUUID();
+        localStorage.setItem(`qitHostToken_${roomId}`, myHostToken);
+    }
+
+    const hostActionRef = ref(db, `rooms/${roomId}/hostAction`);
+    
+    update(hostActionRef, {
+        action: actionType,
+        targetPlayerId: activePlayerId || "none",
+        timestamp: serverTimestamp(),
+        token: myHostToken 
+    }).then(() => {
+        console.log(`${actionType} アクションを送信しました。`);
+    }).catch((error) => {
+        console.error("ホスト権限がありません:", error);
+    });
+});

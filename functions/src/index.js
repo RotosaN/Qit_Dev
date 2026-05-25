@@ -45,3 +45,56 @@ exports.checkBuzzer = onValueUpdated({
 
     return null;
 });
+
+exports.onHostAction = onValueUpdated({ 
+    region: "asia-southeast1", 
+    ref: "/rooms/{roomId}/hostAction" 
+}, async (event) => {
+    const db = admin.database();
+    const { roomId } = event.params;
+
+    const actionData = event.data.after.val();
+    if (!actionData || !actionData.timestamp) return null;
+
+    const { action, targetPlayerId } = actionData;
+
+    if (action === "correct" && targetPlayerId && targetPlayerId !== "none") {
+        const playerRef = db.ref(`rooms/${roomId}/player/${targetPlayerId}`);
+        await playerRef.transaction((player) => {
+            if (!player) return player;
+            player.o = (player.o || 0) + 1;
+            player.point = (player.point || 0) + 1; 
+            return player;
+        });
+    } 
+
+    else if (action === "wrong" && targetPlayerId && targetPlayerId !== "none") {
+        const playerRef = db.ref(`rooms/${roomId}/player/${targetPlayerId}`);
+        await playerRef.transaction((player) => {
+            if (!player) return player;
+            player.x = (player.x || 0) + 1;
+            return player;
+        });
+    }
+
+    const playersRef = db.ref(`rooms/${roomId}/player`);
+    const snapshot = await playersRef.get();
+    const playersData = snapshot.val();
+
+    if (playersData) {
+        const updates = {};
+        Object.keys(playersData).forEach((playerId) => {
+            updates[`rooms/${roomId}/player/${playerId}/rank`] = 0;
+            updates[`rooms/${roomId}/player/${playerId}/isPushing`] = false;
+        });
+        await db.ref().update(updates);
+    }
+
+    await db.ref(`rooms/${roomId}/hostAction`).update({
+        action: "idle",
+        targetPlayerId: "none",
+        timestamp: null
+    });
+
+    return null;
+});
