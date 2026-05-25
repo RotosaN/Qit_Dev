@@ -25,6 +25,10 @@ exports.checkBuzzer = onValueUpdated({
         return null;
     }
 
+    if(beforeData.isLost) {
+        return null;
+    }
+
     const roomPlayersRef = db.ref(`rooms/${roomId}/player`);
 
     await roomPlayersRef.transaction((players) => {
@@ -58,21 +62,39 @@ exports.onHostAction = onValueUpdated({
 
     const { action, targetPlayerId } = actionData;
 
+
     if (action === "correct" && targetPlayerId && targetPlayerId !== "none") {
         const playerRef = db.ref(`rooms/${roomId}/player/${targetPlayerId}`);
+        const ruleData = (await db.ref(`rooms/${roomId}/roomRule`).get()).val();
         await playerRef.transaction((player) => {
             if (!player) return player;
-            player.o = (player.o || 0) + 1;
-            player.point = (player.point || 0) + 1; 
+
+            if(ruleData.rule == "ox"){
+                player.o = (player.o || 0) + 1;
+                if(ruleData.lostO <= player.o){
+                    player.isWin = true
+                }
+            }
+
+
             return player;
         });
     } 
 
     else if (action === "wrong" && targetPlayerId && targetPlayerId !== "none") {
         const playerRef = db.ref(`rooms/${roomId}/player/${targetPlayerId}`);
+        const ruleData = (await db.ref(`rooms/${roomId}/roomRule`).get()).val();
         await playerRef.transaction((player) => {
             if (!player) return player;
-            player.x = (player.x || 0) + 1;
+
+            if(ruleData.rule == "ox"){
+                player.x = (player.x || 0) + 1;
+                if(ruleData.lostX <= player.x){
+                    player.isLost = true
+                }
+            }
+
+
             return player;
         });
     }

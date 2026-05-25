@@ -21,6 +21,13 @@ body {
     margin: 0 auto;
 }
 
+.noQ{
+    font-family: "GenMid";
+    text-align: center;
+    transform: tranlateY(-50%);
+    color: #0000007a;
+}
+
 .correctButton .material-symbols-outlined {
   font-size: 34px;
 }
@@ -31,6 +38,11 @@ body {
 
 .throughButton .material-symbols-outlined {
   font-size: 34px;
+}
+
+.correctButton:active{
+    transform: translateY(6px);
+    box-shadow: 0 2px 0 #cb3030;
 }
 
 .judgeSubtext {
@@ -611,4 +623,56 @@ body {
         min-width: 120px;
         max-width: 160px;
     }
+}
+
+
+
+
+
+
+/* コンテナ全体の縦並び制御 */
+#csvUploadContainer.blockStyle {
+    padding: 15px 20px; 
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+}
+
+/* ファイルを選択 ボタンのデザイン */
+.custom-file-upload {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background-color: #2c2c2c;
+    color: #e3e3e3;
+    border: 1px solid #444444;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.custom-file-upload:hover {
+    background-color: #3a3a3a;
+    border-color: #666666;
+    color: #ffffff;
+}
+
+/* ボタンの下ではなく、右側に並ぶファイル名のデザイン */
+.file-name-text {
+    margin-top: 4px; /* ボタンとの間の僅かな隙間 */
+    font-size: 13px;
+    color: #888888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+#csvFileInput {
+    display: none !important;
 }

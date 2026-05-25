@@ -126,6 +126,8 @@ entrySubmitBtn.addEventListener("click", () => {
         pushedAt: 0,
         isHost: false,
         rank: 0,
+        isWin: false,
+        isLost: false
     }
 
     console.log("initital")
@@ -242,6 +244,18 @@ function updatePlayerSvg(svgDoc, playerId, player) {
 
     const slashNum = svgDoc.getElementById('slashNum');
     const lamplit = svgDoc.getElementById('lamp');
+    const oCount = svgDoc.getElementById('oCount');
+    const xCount = svgDoc.getElementById('xCount');
+
+    oCount.textContent = player.o
+    xCount.textContent = player.x
+
+    if(player.isLost){
+        svgDoc.getElementById('lost').classList.remove("hidden");
+    }else{
+        svgDoc.getElementById('lost').classList.add("hidden");
+    }
+
 
     if (player.rank != 0) {
         const rankColor = ["#edc500", "#939393", "#c97c2a", "#282828"];
@@ -258,6 +272,7 @@ function updatePlayerSvg(svgDoc, playerId, player) {
         if (lamplit) lamplit.classList.remove("blink");
     }
 }
+
 function getOrdinal(n) {
     const s = ["th", "st", "nd", "rd"],
         v = n % 100;
@@ -344,6 +359,9 @@ window.addEventListener('keydown', (event) => {
 });
 
 $(document).on("click", ".correctButton, .wrongButton, .throughButton", function() {
+
+    this.blur();
+
     const activePlayerId = Object.keys(currentPlayersData).find(
         id => currentPlayersData[id] && currentPlayersData[id].rank === 1
     );
@@ -376,4 +394,74 @@ $(document).on("click", ".correctButton, .wrongButton, .throughButton", function
     }).catch((error) => {
         console.error("ホスト権限がありません:", error);
     });
+});
+
+document.getElementById("csvFileInput").addEventListener("change", function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const text = e.target.result;
+        const lines = text.split(/\r?\n/);
+        const quizList = {};
+        let qCount = 1;
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (line === "") continue;
+
+            const parts = line.split(",");
+            
+            if (parts.length >= 2) {
+                const question = parts[0].trim();
+                const answer = parts[1].trim();
+
+                quizList[qCount] = {
+                    q: question,
+                    ans: answer
+                };
+                qCount++;
+            }
+        }
+
+        const quizListRef = ref(db, `rooms/${roomId}/quizList`);
+        
+        set(quizListRef, quizList)
+            .then(() => {
+                alert(`確認: ${qCount - 1}問のクイズを正常に読み込みました！`);
+                document.getElementById("totalQ").textContent = qCount - 1;
+            })
+            .catch((error) => {
+                console.error("CSVの書き込みに失敗しました:", error);
+                alert("データベースへの保存に失敗しました。");
+            });
+    };
+    reader.readAsText(file, "UTF-8"); 
+});
+
+
+$(document).ready(function() {
+    
+    $(document).on('change', 'input[type="checkbox"][data-target]', function() {
+        const targetSelector = $(this).data('target'); 
+        const $targetElement = $(targetSelector);
+
+        if ($(this).is(':checked')) {
+            $targetElement.fadeIn(200);
+        } else {
+            $targetElement.fadeOut(200);
+        }
+    });
+
+    $('input[type="checkbox"][data-target]').each(function() {
+        const targetSelector = $(this).data('target');
+        if ($(this).is(':checked')) {
+            $(targetSelector).show();
+        } else {
+            $(targetSelector).hide();
+        }
+    });
+
 });
