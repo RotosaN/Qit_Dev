@@ -136,11 +136,11 @@ entrySubmitBtn.addEventListener("click", () => {
 
 })
 
-playerNameInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-        entrySubmitBtn.click()
-    }
-})
+// playerNameInput.addEventListener("keypress", (e) => {
+//     if (e.key === "Enter") {
+//         entrySubmitBtn.click()
+//     }
+// })
 
 function copy() {
     const targetCode = document.getElementById("roomidText")
@@ -177,8 +177,7 @@ function setPlayerData(playersData) {
         let svgObj = mainObjContainer.querySelector(`[data-id="${playerId}"]`);
 
         if (svgObj) {
-            const svgDoc = svgObj.getSVGDocument();
-            if (svgDoc) updatePlayerSvg(svgDoc, playerId, player);
+            updatePlayerSvg(svgObj, playerId, player);
         } else {
             svgObj = document.createElement('object');
             svgObj.setAttribute('data', 'img/ox.svg');
@@ -188,8 +187,7 @@ function setPlayerData(playersData) {
             mainObjContainer.appendChild(svgObj);
 
             svgObj.addEventListener('load', () => {
-                const svgDoc = svgObj.getSVGDocument();
-                if (svgDoc) updatePlayerSvg(svgDoc, playerId, player);
+                updatePlayerSvg(svgObj, playerId, player);
             });
         }
     });
@@ -200,9 +198,16 @@ document.addEventListener('DOMContentLoaded', (event) => {
     roomidtext.textContent = roomId
 });
 
-function updatePlayerSvg(svgDoc, playerId, player) {
+function updatePlayerSvg(svgObj, playerId, player) {
+
+    const svgDoc = svgObj.getSVGDocument();
+
+    if(!svgDoc) return
+
     const playerNameObj = svgDoc.getElementById('playerName');
     if (playerNameObj) playerNameObj.textContent = player.name;
+
+    playerNameObj.setAttribute("fill", playerId == svgObj.dataset.id ? "#000000" : "#FFFFFF")
 
     const slashNum = svgDoc.getElementById('slashNum');
     const lamplit = svgDoc.getElementById('lamp');
@@ -232,8 +237,6 @@ function getOrdinal(n) {
 
 window.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' && event.target.tagName !== 'INPUT') {
-
-        if (isSubmitting) return
 
         const playerRef = ref(db, `rooms/${roomId}/player/${localStorage.getItem("qitPlayerUUID")}`)
 
