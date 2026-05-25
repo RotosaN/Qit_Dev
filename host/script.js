@@ -125,8 +125,12 @@ entrySubmitBtn.addEventListener("click", () => {
         isPushing: false,
         pushedAt: 0,
         isHost: false,
-        rank: 0
+        rank: 0,
+        isWin: false,
+        isLost: false
     }
+
+    console.log("initital")
 
     setPlayerData()
 
@@ -145,10 +149,44 @@ entrySubmitBtn.addEventListener("click", () => {
 function copy() {
     const targetCode = document.getElementById("roomidText")
     navigator.clipboard.writeText(targetCode)
-    alert("コピーしました！")
 }
 
 let playedAnsSound = false;
+
+
+
+let lastPlayedActionId = "";
+
+onValue(ref(db, `rooms/${roomId}/hostAction`), (snapshot) => {
+    const hostData = snapshot.val();
+    if (!hostData || !hostData.timestamp) return; 
+
+    const currentActionId = `${hostData.action}_${hostData.timestamp}`;
+    if (lastPlayedActionId === currentActionId) {
+        return; 
+    }
+
+    if (hostData.action === "wrong") {
+        console.log("★本当のWrong検知");
+        lastPlayedActionId = currentActionId;
+        
+        wrongSound.currentTime = 0;
+        wrongSound.play()
+            .then(() => console.log("🔊 Wrongサウンドの再生に成功しました！"))
+            .catch(e => console.error("❌ Wrongサウンドの再生に失敗:", e));
+    }
+
+    if (hostData.action === "correct") {
+        console.log("★本当のCorrect検知");
+        lastPlayedActionId = currentActionId;
+        
+        correctSound.currentTime = 0;
+        correctSound.play()
+            .then(() => console.log("🔊 Correctサウンドの再生に成功しました！"))
+            .catch(e => console.error("❌ Correctサウンドの再生に失敗:", e));
+    }
+});
+
 
 onValue(ref(db, "rooms/43143/player"), (snapshot) => {
     const playersData = snapshot.val();
@@ -211,6 +249,18 @@ function updatePlayerSvg(svgObj, playerId, player) {
 
     const slashNum = svgDoc.getElementById('slashNum');
     const lamplit = svgDoc.getElementById('lamp');
+    const oCount = svgDoc.getElementById('oCount');
+    const xCount = svgDoc.getElementById('xCount');
+
+    oCount.textContent = player.o
+    xCount.textContent = player.x
+
+    if(player.isLost){
+        svgDoc.getElementById('lost').classList.remove("hidden");
+    }else{
+        svgDoc.getElementById('lost').classList.add("hidden");
+    }
+
 
     if (player.rank != 0) {
         const rankColor = ["#edc500", "#939393", "#c97c2a", "#282828"];
@@ -227,6 +277,7 @@ function updatePlayerSvg(svgObj, playerId, player) {
         if (lamplit) lamplit.classList.remove("blink");
     }
 }
+
 function getOrdinal(n) {
     const s = ["th", "st", "nd", "rd"],
         v = n % 100;
@@ -239,7 +290,6 @@ window.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' && event.target.tagName !== 'INPUT') {
 
         const playerRef = ref(db, `rooms/${roomId}/player/${localStorage.getItem("qitPlayerUUID")}`)
-
         update(playerRef, {
             isPushing: true,
             pushedAt: serverTimestamp()
@@ -247,32 +297,177 @@ window.addEventListener('keydown', (event) => {
     }
 
     if (event.key === 'o' && event.target.tagName !== 'INPUT') {
-        correctSound.currentTime = 0;
-        correctSound.play();
-        get(ref(db, `rooms/${roomId}/player`)).then((snapshot) => {
-            const playersData = snapshot.val();
-            if (!playersData) return;
-            Object.keys(playersData).forEach((playerId) => {
-                update(ref(db, `rooms/${roomId}/player/${playerId}`), {
-                    rank: 0,
-                    isPushing: false
-                });
-            });
+        const playerRef = ref(db, `rooms/${roomId}/player/${localStorage.getItem("qitPlayerUUID")}`)
+        update(playerRef, {
+            isPushing: true,
+            pushedAt: serverTimestamp()
         })
     }
 
     if (event.key === 'x' && event.target.tagName !== 'INPUT') {
-        wrongSound.currentTime = 0;
-        wrongSound.play();
-        get(ref(db, `rooms/${roomId}/player`)).then((snapshot) => {
-            const playersData = snapshot.val();
-            if (!playersData) return;
-            Object.keys(playersData).forEach((playerId) => {
-                update(ref(db, `rooms/${roomId}/player/${playerId}`), {
-                    rank: 0,
-                    isPushing: false
-                });
-            });
+        const playerRef = ref(db, `rooms/${roomId}/player/${localStorage.getItem("qitPlayerUUID")}`)
+        update(playerRef, {
+            isPushing: true,
+            pushedAt: serverTimestamp()
         })
     }
 })
+
+
+
+
+let currentPlayersData = {};
+
+onValue(ref(db, `rooms/${roomId}/player`), (snapshot) => {
+    const playersData = snapshot.val();
+    if (!playersData) return;
+
+    currentPlayersData = playersData; 
+    setPlayerData(playersData);
+
+    const hasRankOne = Object.values(playersData).some(player => player.rank == 1);
+
+    if (hasRankOne) {
+        if (!playedAnsSound) {
+            ansSound.currentTime = 0;
+            ansSound.play();
+            playedAnsSound = true;
+        }
+    } else {
+        playedAnsSound = false;
+    }
+});
+
+let isSubmitting = false;
+
+window.addEventListener('keydown', (event) => {
+    const myId = localStorage.getItem("qitPlayerUUID");
+    if (!myId || !currentPlayersData[myId]) return;
+
+    if (currentPlayersData[myId].rank !== 0) {
+        return; 
+    }
+
+    if (event.key === 'Enter' && event.target.tagName !== 'INPUT') {
+        if (isSubmitting) return;
+        isSubmitting = true;
+
+        const playerRef = ref(db, `rooms/${roomId}/player/${myId}`);
+        update(playerRef, {
+            isPushing: true,
+            pushedAt: serverTimestamp()
+        }).then(() => {
+            setTimeout(() => { isSubmitting = false; }, 1000);
+        }).catch(() => {
+            isSubmitting = false;
+        });
+    }
+});
+
+$(document).on("click", ".correctButton, .wrongButton, .throughButton", function() {
+
+    this.blur();
+
+    const activePlayerId = Object.keys(currentPlayersData).find(
+        id => currentPlayersData[id] && currentPlayersData[id].rank === 1
+    );
+
+    let actionType = "";
+    if ($(this).hasClass("correctButton")) actionType = "correct";
+    if ($(this).hasClass("wrongButton")) actionType = "wrong";
+    if ($(this).hasClass("throughButton")) actionType = "through";
+
+    if (actionType !== "through" && !activePlayerId) {
+        alert("現在、解答権を持っている（1stの）プレイヤーがいません。");
+        return;
+    }
+
+    let myHostToken = localStorage.getItem(`qitHostToken_${roomId}`);
+    if (!myHostToken) {
+        myHostToken = self.crypto.randomUUID();
+        localStorage.setItem(`qitHostToken_${roomId}`, myHostToken);
+    }
+
+    const hostActionRef = ref(db, `rooms/${roomId}/hostAction`);
+    
+    update(hostActionRef, {
+        action: actionType,
+        targetPlayerId: activePlayerId || "none",
+        timestamp: serverTimestamp(),
+        token: myHostToken 
+    }).then(() => {
+        console.log(`${actionType} アクションを送信しました。`);
+    }).catch((error) => {
+        console.error("ホスト権限がありません:", error);
+    });
+});
+
+document.getElementById("csvFileInput").addEventListener("change", function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const text = e.target.result;
+        const lines = text.split(/\r?\n/);
+        const quizList = {};
+        let qCount = 1;
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (line === "") continue;
+
+            const parts = line.split(",");
+            
+            if (parts.length >= 2) {
+                const question = parts[0].trim();
+                const answer = parts[1].trim();
+
+                quizList[qCount] = {
+                    q: question,
+                    ans: answer
+                };
+                qCount++;
+            }
+        }
+
+        const quizListRef = ref(db, `rooms/${roomId}/quizList`);
+        
+        set(quizListRef, quizList)
+            .then(() => {
+                alert(`確認: ${qCount - 1}問のクイズを正常に読み込みました！`);
+                document.getElementById("totalQ").textContent = qCount - 1;
+            })
+            .catch((error) => {
+                console.error("CSVの書き込みに失敗しました:", error);
+                alert("データベースへの保存に失敗しました。");
+            });
+    };
+    reader.readAsText(file, "UTF-8"); 
+});
+
+
+$(document).ready(function() {
+    
+    $(document).on('change', 'input[type="checkbox"][data-target]', function() {
+        const targetSelector = $(this).data('target'); 
+        const $targetElement = $(targetSelector);
+
+        if ($(this).is(':checked')) {
+            $targetElement.fadeIn(200);
+        } else {
+            $targetElement.fadeOut(200);
+        }
+    });
+
+    $('input[type="checkbox"][data-target]').each(function() {
+        const targetSelector = $(this).data('target');
+        if ($(this).is(':checked')) {
+            $(targetSelector).show();
+        } else {
+            $(targetSelector).hide();
+        }
+    });
+
+});

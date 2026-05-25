@@ -95,6 +95,12 @@ body {
     align-items: center;
 }
 
+.btmC {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 #roomCode {
     width: 80%;
     height: 42px;
@@ -120,6 +126,9 @@ body {
 
 /* ボタン本体 */
 #createRoomBtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   display: inline-block;
   padding: 0.8em 3em;
   background-color: #ffb000;

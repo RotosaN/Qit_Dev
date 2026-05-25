@@ -7,6 +7,8 @@
     <title>Qit</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,200" />
     <script>
         (function (d) {
             var config = {
@@ -66,17 +68,22 @@
                         </div>
 
                         <div class="infoCenter">
-                            <div class="question-box">
+
+                            <div class="noQ">
+                                <p>問題文が読み込まれていません。</br>SETTINGSからCsvを読み込むことで表示できるようになります。</p>
+                            </div>
+
+                            <!-- <div class="question-box">
                                 <p id="questionText">
-                                    <span id="qHead">Q.
-                                    </span>
+                                    <span id="qHead">Q.</span>
+                                    日本で一番高い山は富士山ですが、世界で一番高い山はなんでしょう？
                                 </p>
                                 <p id="answerText">
                                     <span id="ansHead">ANS. </span>
+                                    エベレスト（チョモランマ）
                                 </p>
-                            </div>
+                            </div> -->
                         </div>
-
                         <div class="infoSide">
                             <p class="label">ルール</p>
                             <p id="ruleDisplay" class="data">7○3×</p>
@@ -84,12 +91,24 @@
                     </div>
                 </div>
                 <div class="mainObj">
-                    <!-- <object data="img/ox.svg" type="image/svg+xml" class="player"></object> -->
                 </div>
                 <div class="buzzerArea">
-                    <div class="buttonObj">
-                    <object data="img/button_3d.svg" type="image/svg+xml" class="buzzerBtn"></object>
-                    <span class="keybind">Space</span><span class="keybind">Enter</span>で早押し
+                    <div class="hostButtons">
+                        <button class="correctButton">
+                            <span class="material-symbols-outlined">circle</span>
+                            </br>
+                            <span class="judgeSubtext">正解</span>
+                        </button>
+                        <button class="wrongButton">
+                            <span class="material-symbols-outlined">close</span>
+                            </br>
+                            <span class="judgeSubtext">不正解</span>
+                        </button>
+                        <button class="throughButton">
+                            <span class="material-symbols-outlined">arrow_forward</span>
+                            </br>
+                            <span class="judgeSubtext">スルー</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -97,24 +116,39 @@
                 <div id="settingContent">
                     <h3 id="settingTitle">SETTINGS</h3>
                     <p class="configLabel">部屋の設定 <span class="settingLabelEng">ROOM CONFIG</span></p>
-                    <!-- <div class="settingItem">
-                        <p class="settingLabel">誤答時にフリーズする</p>
-                        <label class="settingToggle">
-                            <input type="checkbox" id="checkFreeze">
-                        </label>
-                    </div> -->
 
                     <div class="settingItem">
                         <p class="settingLabel">部屋の名前</p>
                         <div class="settingInput">
-                            <input id="roomName">
+                            <input id="roomName" style="--inputBoxWidth:150px">
                         </div>
                     </div>
 
                     <div class="settingItem">
                         <p class="settingLabel">ルームID</p>
-                        <div id="roomID"><span id="roomidText"></span>  <span><img src="img/content_copy_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.svg" onclick="copy()"></span></div>
+                        <div id="roomID"><span id="roomidText"></span> <span><img
+                                    src="img/content_copy_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.svg"
+                                    onclick="copy()"></span></div>
                     </div>
+
+<div class="settingItem">
+    <p class="settingLabel">問題文を表示する</p>
+    <label class="settingToggle">
+        <input type="checkbox" id="checkShowQuestion" data-target="#csvUploadContainer">
+    </label>
+</div>
+
+<div class="settingItem blockStyle" id="csvUploadContainer" style="display: none;">
+    <p class="settingLabel">クイズCSVの読み込み</p>
+    
+    <label class="custom-file-upload">
+        <span class="material-symbols-outlined">upload_file</span>
+        <span class="file-label-text">ファイルを選択</span>
+        <input type="file" id="csvFileInput" accept=".csv" />
+    </label>
+    <span id="file-name-display" class="file-name-text">選択されていません</span>
+</div>
+
 
                     <p class="configLabel">ゲームルール <span class="settingLabelEng">GAME RULE</span></p>
                     <div class="customSelect">
@@ -135,28 +169,33 @@
                         <input type="hidden" id="ruleType" value="single">
                     </div>
 
-                    <hr>
+                    <br>
 
-                    <p class="configLabel">得点形式 <span class="settingLabelEng">ANSWER RULE</span></p>
-                    <div class="customSelect">
-                        <div class="selected">
-                            1
+                    <div class="settingItem-left">
+                        <div class="settingInput" style="--inputBoxWidth:100px">
+                            <input id="input_O" value="7">
                         </div>
-                        <div class="options">
-                            <div class="option selectedOption" data-value="te1">
-                                2
-                            </div>
-                            <div class="option" data-value="te2">
-                                3
-                            </div>
+                        <p class="settingLabel">問正解で勝ち抜け</p>
+                    </div>
+
+                    <div class="settingItem-left">
+                        <div class="settingInput">
+                            <input id="inputX" style="--inputBoxWidth:100px" value="3">
                         </div>
-                        <input type="hidden" id="ruleType1" value="te1">
+                        <p class="settingLabel">問誤答で失格</p>
+                    </div>
+
+                    <div class="settingItem">
+                        <p class="settingLabel">誤答判定後にボタンをリセットする</p>
+                        <label class="settingToggle">
+                            <input type="checkbox" id="checkFreeze">
+                        </label>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </body>
-<script src="script.js"  type="module"></script>
+<script src="script.js" type="module"></script>
 
 </html>
