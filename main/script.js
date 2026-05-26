@@ -55,23 +55,9 @@ createBtn.onclick = async () => {
                     incorrect: { x: 1 }
                 }
             },
-            questionData: {},
-            player: {
-                "uid_example_alex": {
-                    isHost: true,
-                    playerName: "Alex",
-                    o: 0,
-                    x: 0,
-                    point: 0,
-                    boardAns: false,
-                    freeze: 0
-                },
-            },
-            slashData: {
-                "player1": { pushDate: Date.now() },
-                "player2": { pushDate: Date.now() + 100 }
-            },
-            winner: "player2"
+            quizList: {},
+            player: {},
+            winner: false
         });
 
         window.location.href = `../host/index.html?rid=${roomId}`;

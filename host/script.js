@@ -188,7 +188,7 @@ onValue(ref(db, `rooms/${roomId}/hostAction`), (snapshot) => {
 });
 
 
-onValue(ref(db, "rooms/43143/player"), (snapshot) => {
+onValue(ref(db, `rooms/${roomId}/player`), (snapshot) => {
     const playersData = snapshot.val();
     if (!playersData) return;
 
@@ -372,7 +372,6 @@ $(document).on("click", ".correctButton, .wrongButton, .throughButton", function
     if ($(this).hasClass("throughButton")) actionType = "through";
 
     if (actionType !== "through" && !activePlayerId) {
-        alert("現在、解答権を持っている（1stの）プレイヤーがいません。");
         return;
     }
 
@@ -425,6 +424,7 @@ document.getElementById("csvFileInput").addEventListener("change", function(even
                 qCount++;
             }
         }
+
 
         const quizListRef = ref(db, `rooms/${roomId}/quizList`);
         
