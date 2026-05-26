@@ -119,7 +119,7 @@
   <path class="cls-7 ansPlayer"
     d="M30.11,81.75h196.82v222.03c0,16.62-13.49,30.11-30.11,30.11H30.11c-16.62,0-30.11-13.49-30.11-30.11V111.87c0-16.62,13.49-30.11,30.11-30.11Z" />
   <text class="cls-3 playerName" transform="translate(113.465 148.69)" text-anchor="middle"
-    id="playerName">TESTPLAYER</text>
+    id="playerName" fill="#000000">TESTPLAYER</text>
   <g>
     <text class="cls-2" transform="translate(67.465 278.93)" text-anchor="middle" id="oCount">0</text>
     <path class="cls-4"
