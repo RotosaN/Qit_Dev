@@ -126,7 +126,7 @@ entrySubmitBtn.addEventListener("click", () => {
         pushedAt: 0,
         isHost: false,
         rank: 0,
-        isWin: false,
+        isWon: false,
         isLost: false
     }
 
@@ -157,55 +157,35 @@ let playedAnsSound = false;
 
 let lastPlayedActionId = "";
 
-onValue(ref(db, `rooms/${roomId}/hostAction`), (snapshot) => {
-    const hostData = snapshot.val();
-    if (!hostData || !hostData.timestamp) return; 
+// onValue(ref(db, `rooms/${roomId}/hostAction`), (snapshot) => {
+//     const hostData = snapshot.val();
+//     if (!hostData || !hostData.timestamp) return; 
 
-    const currentActionId = `${hostData.action}_${hostData.timestamp}`;
-    if (lastPlayedActionId === currentActionId) {
-        return; 
-    }
+//     const currentActionId = `${hostData.action}_${hostData.timestamp}`;
+//     if (lastPlayedActionId === currentActionId) {
+//         return; 
+//     }
 
-    if (hostData.action === "wrong") {
-        console.log("★本当のWrong検知");
-        lastPlayedActionId = currentActionId;
+//     if (hostData.action === "wrong") {
+//         console.log("★本当のWrong検知");
+//         lastPlayedActionId = currentActionId;
         
-        wrongSound.currentTime = 0;
-        wrongSound.play()
-            .then(() => console.log("🔊 Wrongサウンドの再生に成功しました！"))
-            .catch(e => console.error("❌ Wrongサウンドの再生に失敗:", e));
-    }
+//         wrongSound.currentTime = 0;
+//         wrongSound.play()
+//             .then(() => console.log("🔊 Wrongサウンドの再生に成功しました！"))
+//             .catch(e => console.error("❌ Wrongサウンドの再生に失敗:", e));
+//     }
 
-    if (hostData.action === "correct") {
-        console.log("★本当のCorrect検知");
-        lastPlayedActionId = currentActionId;
+//     if (hostData.action === "correct") {
+//         console.log("★本当のCorrect検知");
+//         lastPlayedActionId = currentActionId;
         
-        correctSound.currentTime = 0;
-        correctSound.play()
-            .then(() => console.log("🔊 Correctサウンドの再生に成功しました！"))
-            .catch(e => console.error("❌ Correctサウンドの再生に失敗:", e));
-    }
-});
-
-
-onValue(ref(db, `rooms/${roomId}/player`), (snapshot) => {
-    const playersData = snapshot.val();
-    if (!playersData) return;
-
-    setPlayerData(playersData);
-
-    const hasRankOne = Object.values(playersData).some(player => player.rank == 1);
-
-    if (hasRankOne) {
-        if (!playedAnsSound) {
-            ansSound.currentTime = 0;
-            ansSound.play();
-            playedAnsSound = true;
-        }
-    } else {
-        playedAnsSound = false;
-    }
-});
+//         correctSound.currentTime = 0;
+//         correctSound.play()
+//             .then(() => console.log("🔊 Correctサウンドの再生に成功しました！"))
+//             .catch(e => console.error("❌ Correctサウンドの再生に失敗:", e));
+//     }
+// });
 
 function setPlayerData(playersData) {
     const mainObjContainer = document.querySelector('.mainObj');
@@ -249,6 +229,13 @@ function updatePlayerSvg(svgDoc, playerId, player) {
 
     oCount.textContent = player.o
     xCount.textContent = player.x
+
+
+    if(player.isWon){
+        svgDoc.getElementById('won').classList.remove("hidden");
+    }else{
+        svgDoc.getElementById('won').classList.add("hidden");
+    }
 
     if(player.isLost){
         svgDoc.getElementById('lost').classList.remove("hidden");
@@ -375,7 +362,7 @@ $(document).on("click", ".correctButton, .wrongButton, .throughButton", function
         return;
     }
 
-    let myHostToken = localStorage.getItem(`qitHostToken_${roomId}`);
+    let myHostToken = "s"
     if (!myHostToken) {
         myHostToken = self.crypto.randomUUID();
         localStorage.setItem(`qitHostToken_${roomId}`, myHostToken);

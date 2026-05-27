@@ -17,53 +17,43 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getDatabase(app);
 
-const createBtn = document.getElementById('createRoomBtn');
+const createBtn = document.getElementById('makeRoomBtn');
 const roomCodeInput = document.getElementById('roomCode');
 
-// roomCodeInput.addEventListener('input', async () => {
-//     const roomId = roomCodeInput.value.trim();
-//     if (roomId.length == 5) {
-//         try {
-//             const roomRef = ref(db, `rooms/${roomId}`);
-//             const snapshot = await get(roomRef);
-//             if (snapshot.exists()) {
-//                 window.location.href = `../host/index.html?rid=${roomId}`;
-//             } else {
-//                 roomCodeInput.value = "";
-//             }
-//         } catch (e) { }
-//     }
-// });
+createBtn.onclick = async () => {
+    const roomId = Math.floor(10000 + Math.random() * 90000).toString();
 
-// // 部屋を作るボタンの処理（既存）
-// createBtn.onclick = async () => {
-//     const roomId = Math.floor(10000 + Math.random() * 90000).toString();
+    const hostToken = self.crypto.randomUUID();
+    localStorage.setItem(`qitHostToken_${roomId}`, hostToken);
 
-//     try {
-//         await set(ref(db, `rooms/${roomId}`), {
-//             hostName: "TestNameB",
-//             status: "waiting",
-//             createdAt: Date.now(),
-//             roomRule: {
-//                 rule: "ox",
-//                 ansRule: "push",
-//                 winO: 7,
-//                 lostX: 3,
-//                 winPoint: false,
-//                 customRule: {
-//                     correct: { o: 1 },
-//                     incorrect: { x: 1 }
-//                 }
-//             },
-//             quizList: {},
-//             player: {},
-//             winner: false
-//         });
+    try {
+        await set(ref(db, `rooms/${roomId}`), {
+            hostName: "TestNameA",
+            hostAction: {
+                hostToken: hostToken
+            },
+            status: "waiting",
+            createdAt: Date.now(),
+            roomRule: {
+                rule: "ox",
+                ansRule: "push",
+                winO: 7,
+                lostX: 3,
+                winPoint: false,
+                customRule: {
+                    correct: { o: 1 },
+                    incorrect: { x: 1 }
+                }
+            },
+            quizList: {},
+            player: {},
+            winner: false
+        });
 
-//         window.location.href = `../host/index.html?rid=${roomId}`;
+        window.location.href = `../host/index.html?rid=${roomId}`;
 
-//     } catch (e) { }
-// };
+    } catch (e) { }
+};
 
 const inputs = document.querySelectorAll(".digit-input");
 

@@ -16,7 +16,7 @@ exports.checkBuzzer = onValueUpdated({
     if (!afterData || afterData.isPushing !== true) return null;
     if (beforeData && beforeData.isPushing === true) return null;
     if (afterData.rank !== 0) return null;
-    if (beforeData && beforeData.isLost) return null;
+    if (beforeData && ( beforeData.isLost || beforeData.isWon || beforeData.freeze >= 1)) return null;
 
     const roomPlayersRef = db.ref(`rooms/${roomId}/player`);
 
@@ -61,8 +61,8 @@ exports.onHostAction = onValueUpdated({
 
             if (ruleData && ruleData.rule == "ox") {
                 player.o = (player.o || 0) + 1;
-                if (ruleData.lostO <= player.o) {
-                    player.isWin = true;
+                if (ruleData.winO <= player.o) {
+                    player.isWon = true;
                 }
             }
             return player;
