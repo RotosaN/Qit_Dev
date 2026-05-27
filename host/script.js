@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js"
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js"
 import { getDatabase, ref, set, onValue, get, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js"
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDoPV7LFkGhG8qBGVHa-YwmP4L2ycghdRc",
@@ -11,11 +12,29 @@ const firebaseConfig = {
     messagingSenderId: "457647660304",
     appId: "1:457647660304:web:663017b8846e8e0ddad995",
     measurementId: "G-WZ5EW3P7KF"
-}
+};
 
-const app = initializeApp(firebaseConfig)
-const analytics = getAnalytics(app)
-const db = getDatabase(app)
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = getDatabase(app);
+const auth = getAuth(app);
+
+let currentUid = null;
+
+signInAnonymously(auth)
+    .then(() => {
+
+    })
+    .catch((error) => {
+        console.error("匿名ログインに失敗しました:", error);
+    });
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        currentUid = user.uid;
+        console.log("ユーザーIDが確定しました:", currentUid);
+    }
+});
 
 let myPlayerId
 const url = new URL(window.location.href)
@@ -85,13 +104,17 @@ const nameInputModal = document.getElementById("nameInputModal")
 const playerNameInput = document.getElementById("playerNameInput")
 const entrySubmitBtn = document.getElementById("entrySubmitBtn")
 
-document.addEventListener("DOMContentLoaded", () => {
-    const savedName = localStorage.getItem("qitPlayerName")
-    if (savedName) {
-        playerNameInput.value = savedName
+let isHost = false
+
+onValue(ref(db, `rooms/${roomId}`), (snapshot) => {
+    const roomData = snapshot.val();
+    if (!roomData) return;
+    const myUid = auth.currentUser ? auth.currentUser.uid : null;
+    if (roomData.hostUid && myUid && roomData.hostUid === myUid) {
+        isHost = true;
+        console.log("🟢 ホストとして判定されました");
     }
-    nameInputModal.classList.add("active")
-})
+});
 
 entrySubmitBtn.addEventListener("click", () => {
 
@@ -140,11 +163,11 @@ entrySubmitBtn.addEventListener("click", () => {
 
 })
 
-playerNameInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-        entrySubmitBtn.click()
-    }
-})
+// playerNameInput.addEventListener("keypress", (e) => {
+//     if (e.key === "Enter") {
+//         entrySubmitBtn.click()
+//     }
+// })
 
 function copy() {
     const targetCode = document.getElementById("roomidText")
@@ -169,7 +192,7 @@ let lastPlayedActionId = "";
 //     if (hostData.action === "wrong") {
 //         console.log("★本当のWrong検知");
 //         lastPlayedActionId = currentActionId;
-        
+
 //         wrongSound.currentTime = 0;
 //         wrongSound.play()
 //             .then(() => console.log("🔊 Wrongサウンドの再生に成功しました！"))
@@ -179,7 +202,7 @@ let lastPlayedActionId = "";
 //     if (hostData.action === "correct") {
 //         console.log("★本当のCorrect検知");
 //         lastPlayedActionId = currentActionId;
-        
+
 //         correctSound.currentTime = 0;
 //         correctSound.play()
 //             .then(() => console.log("🔊 Correctサウンドの再生に成功しました！"))
@@ -216,6 +239,14 @@ function setPlayerData(playersData) {
 document.addEventListener('DOMContentLoaded', (event) => {
     const roomidtext = document.getElementById('roomidText');
     roomidtext.textContent = roomId
+
+    const savedName = localStorage.getItem("qitPlayerName")
+
+    if (savedName) {
+        playerNameInput.value = savedName
+    }
+
+    nameInputModal.classList.add("active")
 });
 
 function updatePlayerSvg(svgDoc, playerId, player) {
@@ -231,15 +262,15 @@ function updatePlayerSvg(svgDoc, playerId, player) {
     xCount.textContent = player.x
 
 
-    if(player.isWon){
+    if (player.isWon) {
         svgDoc.getElementById('won').classList.remove("hidden");
-    }else{
+    } else {
         svgDoc.getElementById('won').classList.add("hidden");
     }
 
-    if(player.isLost){
+    if (player.isLost) {
         svgDoc.getElementById('lost').classList.remove("hidden");
-    }else{
+    } else {
         svgDoc.getElementById('lost').classList.add("hidden");
     }
 
@@ -268,42 +299,13 @@ function getOrdinal(n) {
 
 
 
-window.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' && event.target.tagName !== 'INPUT') {
-        const playerRef = ref(db, `rooms/${roomId}/player/${localStorage.getItem("qitPlayerUUID")}`)
-        update(playerRef, {
-            isPushing: true,
-            pushedAt: serverTimestamp()
-        })
-    }
-
-    if (event.key === 'o' && event.target.tagName !== 'INPUT') {
-        const playerRef = ref(db, `rooms/${roomId}/player/${localStorage.getItem("qitPlayerUUID")}`)
-        update(playerRef, {
-            isPushing: true,
-            pushedAt: serverTimestamp()
-        })
-    }
-
-    if (event.key === 'x' && event.target.tagName !== 'INPUT') {
-        const playerRef = ref(db, `rooms/${roomId}/player/${localStorage.getItem("qitPlayerUUID")}`)
-        update(playerRef, {
-            isPushing: true,
-            pushedAt: serverTimestamp()
-        })
-    }
-})
-
-
-
-
 let currentPlayersData = {};
 
 onValue(ref(db, `rooms/${roomId}/player`), (snapshot) => {
     const playersData = snapshot.val();
     if (!playersData) return;
 
-    currentPlayersData = playersData; 
+    currentPlayersData = playersData;
     setPlayerData(playersData);
 
     const hasRankOne = Object.values(playersData).some(player => player.rank == 1);
@@ -326,7 +328,7 @@ window.addEventListener('keydown', (event) => {
     if (!myId || !currentPlayersData[myId]) return;
 
     if (currentPlayersData[myId].rank !== 0) {
-        return; 
+        return;
     }
 
     if (event.key === 'Enter' && event.target.tagName !== 'INPUT') {
@@ -345,7 +347,7 @@ window.addEventListener('keydown', (event) => {
     }
 });
 
-$(document).on("click", ".correctButton, .wrongButton, .throughButton", function() {
+$(document).on("click", ".correctButton, .wrongButton, .throughButton", function () {
 
     this.blur();
 
@@ -362,33 +364,36 @@ $(document).on("click", ".correctButton, .wrongButton, .throughButton", function
         return;
     }
 
-    let myHostToken = "s"
-    if (!myHostToken) {
-        myHostToken = self.crypto.randomUUID();
-        localStorage.setItem(`qitHostToken_${roomId}`, myHostToken);
-    }
-
     const hostActionRef = ref(db, `rooms/${roomId}/hostAction`);
-    
+
     update(hostActionRef, {
         action: actionType,
         targetPlayerId: activePlayerId || "none",
-        timestamp: serverTimestamp(),
-        token: myHostToken 
+        timestamp: Date.now(),
     }).then(() => {
-        console.log(`${actionType} アクションを送信しました。`);
+        switch (actionType) {
+            case "correct": {
+                correctSound.currentTime = 0;
+                correctSound.play()
+            } break
+
+            case "wrong": {
+                wrongSound.currentTime = 0;
+                wrongSound.play()
+            } break
+        }
     }).catch((error) => {
         console.error("ホスト権限がありません:", error);
     });
 });
 
-document.getElementById("csvFileInput").addEventListener("change", function(event) {
+document.getElementById("csvFileInput").addEventListener("change", function (event) {
     const file = event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
 
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         const text = e.target.result;
         const lines = text.split(/\r?\n/);
         const quizList = {};
@@ -399,7 +404,7 @@ document.getElementById("csvFileInput").addEventListener("change", function(even
             if (line === "") continue;
 
             const parts = line.split(",");
-            
+
             if (parts.length >= 2) {
                 const question = parts[0].trim();
                 const answer = parts[1].trim();
@@ -414,7 +419,7 @@ document.getElementById("csvFileInput").addEventListener("change", function(even
 
 
         const quizListRef = ref(db, `rooms/${roomId}/quizList`);
-        
+
         set(quizListRef, quizList)
             .then(() => {
                 alert(`確認: ${qCount - 1}問のクイズを正常に読み込みました！`);
@@ -425,14 +430,14 @@ document.getElementById("csvFileInput").addEventListener("change", function(even
                 alert("データベースへの保存に失敗しました。");
             });
     };
-    reader.readAsText(file, "UTF-8"); 
+    reader.readAsText(file, "UTF-8");
 });
 
 
-$(document).ready(function() {
-    
-    $(document).on('change', 'input[type="checkbox"][data-target]', function() {
-        const targetSelector = $(this).data('target'); 
+$(document).ready(function () {
+
+    $(document).on('change', 'input[type="checkbox"][data-target]', function () {
+        const targetSelector = $(this).data('target');
         const $targetElement = $(targetSelector);
 
         if ($(this).is(':checked')) {
@@ -442,7 +447,7 @@ $(document).ready(function() {
         }
     });
 
-    $('input[type="checkbox"][data-target]').each(function() {
+    $('input[type="checkbox"][data-target]').each(function () {
         const targetSelector = $(this).data('target');
         if ($(this).is(':checked')) {
             $(targetSelector).show();

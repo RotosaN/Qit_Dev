@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js"
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js"
 import { getDatabase, ref, set, onValue, get, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js"
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDoPV7LFkGhG8qBGVHa-YwmP4L2ycghdRc",
@@ -16,6 +17,24 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getDatabase(app);
+const auth = getAuth(app);
+
+let currentUid = null;
+
+signInAnonymously(auth)
+    .then(() => {
+
+    })
+    .catch((error) => {
+        console.error("匿名ログインに失敗しました:", error);
+    });
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        currentUid = user.uid;
+        console.log("ユーザーIDが確定しました:", currentUid);
+    }
+});
 
 const createBtn = document.getElementById('makeRoomBtn');
 const roomCodeInput = document.getElementById('roomCode');
@@ -27,28 +46,32 @@ createBtn.onclick = async () => {
     localStorage.setItem(`qitHostToken_${roomId}`, hostToken);
 
     try {
+
         await set(ref(db, `rooms/${roomId}`), {
-            hostName: "TestNameA",
-            hostAction: {
-                hostToken: hostToken
-            },
-            status: "waiting",
-            createdAt: Date.now(),
-            roomRule: {
-                rule: "ox",
-                ansRule: "push",
-                winO: 7,
-                lostX: 3,
-                winPoint: false,
-                customRule: {
-                    correct: { o: 1 },
-                    incorrect: { x: 1 }
-                }
-            },
-            quizList: {},
-            player: {},
-            winner: false
-        });
+        hostName: "TestNameA",
+        hostUid: currentUid, 
+        hostAction: {
+            action: "idle",
+            targetPlayerId: "none",
+            timestamp: Date.now()
+        },
+        status: "waiting",
+        createdAt: Date.now(),
+        roomRule: {
+            rule: "ox",
+            ansRule: "push",
+            winO: 7,
+            lostX: 3,
+            winPoint: false,
+            customRule: {
+                correct: { o: 1 },
+                incorrect: { x: 1 }
+            }
+        },
+        quizList: {},
+        player: {},
+        winner: false
+    });
 
         window.location.href = `../host/index.html?rid=${roomId}`;
 
