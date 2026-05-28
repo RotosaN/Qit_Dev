@@ -63,7 +63,7 @@
                         <div class="infoSide">
                             <p class="label">問題数</p>
                             <p class="data">
-                                <span id="currentQ">1</span><span id="Qslash"> / </span><span id="totalQ">10</span>
+                                <span id="currentQ">?</span><span id="Qslash"> / </span><span id="totalQ">?</span>
                             </p>
                         </div>
 
@@ -73,16 +73,18 @@
                                 <p>問題文が読み込まれていません。</br>SETTINGSからCsvを読み込むことで表示できるようになります。</p>
                             </div>
 
-                            <!-- <div class="question-box">
+                            <div class="q0">
+                                <p>ここに前の問題の全文が表示されます</p>
+                            </div>
+
+                            <div class="question-box">
                                 <p id="questionText">
-                                    <span id="qHead">Q.</span>
-                                    日本で一番高い山は富士山ですが、世界で一番高い山はなんでしょう？
+                                    <span id="qHead">Q.</span><span id="qText"></span>
                                 </p>
                                 <p id="answerText">
-                                    <span id="ansHead">ANS. </span>
-                                    エベレスト（チョモランマ）
+                                    <span id="ansHead">ANS. </span><span id="ansText"></span>
                                 </p>
-                            </div> -->
+                            </div>
                         </div>
                         <div class="infoSide">
                             <p class="label">ルール</p>
@@ -107,7 +109,12 @@
                         <button class="throughButton">
                             <span class="material-symbols-outlined">arrow_forward</span>
                             </br>
-                            <span class="judgeSubtext">スルー</span>
+                            <span class="judgeSubtext">次の問題</span>
+                        </button>
+                        <button class="resetButton">
+                            <span class="material-symbols-outlined">history</span>
+                            </br>
+                            <span class="judgeSubtext">早押しリセット</span>
                         </button>
                     </div>
                 </div>
@@ -131,27 +138,34 @@
                                     onclick="copy()"></span></div>
                     </div>
 
-<div class="settingItem">
-    <p class="settingLabel">問題文を表示する</p>
-    <label class="settingToggle">
-        <input type="checkbox" id="checkShowQuestion" data-target="#csvUploadContainer">
-    </label>
-</div>
+                    <div class="settingItem">
+                        <p class="settingLabel">問題文を表示する</p>
+                        <label class="settingToggle">
+                            <input type="checkbox" id="checkShowQuestion" data-target="#csvUploadContainer">
+                        </label>
+                    </div>
 
-<div class="settingItem blockStyle" id="csvUploadContainer" style="display: none;">
-    <p class="settingLabel">問題文（csv）の読み込み</p>
-    
-    <label class="custom-file-upload">
-        <span class="material-symbols-outlined">upload_file</span>
-        <span class="file-label-text">ファイルを選択</span>
-        <input type="file" id="csvFileInput" accept=".csv" />
-    </label>
-    <span id="file-name-display" class="file-name-text">選択されていません</span>
-</div>
+                    <div class="settingItem blockStyle" id="csvUploadContainer" style="display: none;">
+                        <p class="settingLabel">問題文（csv）の読み込み</p>
+
+                        <label class="custom-file-upload">
+                            <span class="material-symbols-outlined">upload_file</span>
+                            <span class="file-label-text">ファイルを選択</span>
+                            <input type="file" id="csvFileInput" accept=".csv" />
+                        </label>
+                        <span id="file-name-display" class="file-name-text">選択されていません</span>
+                    </div>
 
 
                     <p class="configLabel">ゲームルール <span class="settingLabelEng">GAME RULE</span></p>
-                    <div class="customSelect">
+                    <div class="customSelect" id="ruleSelect">
+                        <div class="selected" id="selectedRuleName">ルールの選択</div>
+                        <div class="options" id="ruleOptions">
+                            </div>
+                        <input type="hidden" id="ruleType" value="">
+                    </div>
+
+                    <!-- <div class="customSelect">
                         <div class="selected">
                             N○M×
                         </div>
@@ -167,23 +181,14 @@
                             </div>
                         </div>
                         <input type="hidden" id="ruleType" value="single">
-                    </div>
+                    </div> -->
 
+                    <div class="ruleOverview">
+                        <p id="ruleOverviewText">ここにルールの説明が表示されます。</p>
+                    </div>
                     <br>
 
-                    <div class="settingItem-left">
-                        <div class="settingInput" style="--inputBoxWidth:100px">
-                            <input id="input_O" value="7">
-                        </div>
-                        <p class="settingLabel">問正解で勝ち抜け</p>
-                    </div>
-
-                    <div class="settingItem-left">
-                        <div class="settingInput">
-                            <input id="inputX" style="--inputBoxWidth:100px" value="3">
-                        </div>
-                        <p class="settingLabel">問誤答で失格</p>
-                    </div>
+                    <div id="parametersContainer"></div>
 
                     <div class="settingItem">
                         <p class="settingLabel">誤答判定後にボタンをリセットする</p>

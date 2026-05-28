@@ -48,8 +48,8 @@ createBtn.onclick = async () => {
     try {
 
         await set(ref(db, `rooms/${roomId}`), {
-        hostName: "TestNameA",
         hostUid: currentUid, 
+        nowQNum: 0,
         hostAction: {
             action: "idle",
             targetPlayerId: "none",

@@ -21,10 +21,111 @@ const auth = getAuth(app);
 
 let currentUid = null;
 
-signInAnonymously(auth)
-    .then(() => {
+const gameRules = [
+    {
+        ruleName: "Free ○×",
+        id: "free",
+        ruleOverView: "勝利条件なし、○と×の数が記録されるルールです。",
+        playerCard: "ox"
+    },
+    {
+        ruleName: "Free Point",
+        id: "free",
+        ruleOverView: "勝利条件なし、ポイントが記録されるルールです。",
+        playerCard: "point",
+        parameters: [
+            {id: "correctPoint", inputPosition: 3, text: "正解時ポイント", default: 1},
+            {id: "lostX", inputPosition: 3, text: "誤答時ポイント", default: -1},
+        ]
+    },
+    {
+        ruleName: "N○M×",
+        id: "nonx",
+        ruleOverView: "N○に達したら勝ち抜け、M×に達すると失格する、基本的なルールです。",
+        playerCard: "ox",
+        parameters: [
+            {id: "wonO", inputPosition: "front", text: "○で勝ち抜け", default: 7 },
+            {id: "lostX", inputPosition: "front", text: "×で失格", default: 3 }
+        ]
+    },
+    {
+        ruleName: "N+/M-",
+        id: "npmm",
+        ruleOverView: "正解でNポイント加点、誤答でMポイント減点される、基本的なルールです。",
+        playerCard: "point",
+        parameters: [
+            {id: "correctPoint", inputPosition: 3, text: "正解時ポイント", default: 1},
+            {id: "lostX", inputPosition: 3, text: "誤答時ポイント", default: -1},
+            {id: "wonPoint", inputPosition: "front", text: "ポイントで勝ち抜け", default: 10}
+        ]
+    },
+    {
+        ruleName: "X by Y",
+        id: "nbym",
+        ruleOverView: "正解で加点されるXに、誤答で減点されるYを乗じた数Zがスコアになるルールです。Yが0になると失格します。",
+        playerCard: "xyz",
+        parameters: [
+            {id: "startX", inputPosition: "back", text: "スタート時のX", default: 0},
+            {id: "startY", inputPosition: "back", text: "スタート時のY", default: 10},
+            {id: "correctX", inputPosition: 3, text: "正解時X", default: 1},
+            {id: "correctY", inputPosition: 3, text: "誤答時Y", default: -1},
+            {id: "winZ", inputPosition: 2, text: "Zがで以上で勝ち抜け", default: 100}
+        ]
+    },
+    {
+        ruleName: "Swedish N",
+        id: "swedishn",
+        ruleOverView: "正解を積み重ねるほど誤答時の×の数が増加するルールです。",
+        playerCard: "ox",
+        parameters: [
+            {id: "wonO", inputPosition: "front", text: "○で勝ち抜け", default: 10 },
+            {id: "lostX", inputPosition: "front", text: "×で勝ち抜け", default: 10 },
+            {id: "damage_", inputPosition: 3, text: "誤答時○以上で+1×", default: 1, type: "increasable"}
+        ]
+    },
+    {
+        ruleName: "Freeze N",
+        id: "freezen",
+        ruleOverView: "正解で+1ポイント、Nポイントに達すると勝ち抜け、誤答で正解数の分フリーズ（お休み）状態になるルールです。",
+        playerCard: "point",
+        parameters: [
+            { id: "wonPoint", inputPosition: "front", text: "ポイントで勝ち抜け", default: 10 },
+        ],
+    },
+    {
+        ruleName: "N up down",
+        id: "nupdown",
+        ruleOverView: "テレビ番組「アップダウンクイズ」に由来するルールで、正解で1ポイント、誤答で0ポイントにリセット、Nポイントに達したら勝ち抜けるルールです。",
+        playerCard: "point",
+        parameters: [
+            { id: "wonPoint", inputPosition: "front", text: "ポイントで勝ち抜け", default: 10, },
+        ],
+    },
+    {
+        ruleName: "Exclude",
+        id: "exclude",
+        ruleOverView: "誤答した時、別のプレイヤーが誤答するまでLOCK状態になるルールです。",
+        playerCard: "point",
+        parameters: [
+            { id: "wonPoint", inputPosition: "front", text: "ポイントで勝ち抜け", default: 5, },
+        ],
+    },
+    {
+        ruleName: "N Star",
+        id: "nstar",
+        ruleOverView: "正解でNポイント、誤答で点数の一の位を切り捨て（一の位が0場合、-10ポイント。また、0ptの場合はフリーズ（お休み）状態になる）、スターを1つ削るルールです。スターが0個になったら失格します。",
+        playerCard: "point-star",
+        parameters: [
+            { id: "wonPoint", inputPosition: "front", text: "ポイントで勝ち抜け", default: 7 },
+            { id: "correctPoint", inputPosition: 3, text: "正解時ポイント", default: 7 },
+            { id: "life", inputPosition: 5, text: "スタート時スター", default: 7 },
+            { id: "freeze", inputPosition: 9, text: "0ポイントの誤答で問休み", default: 3 }
+        ],
+    }
+]
 
-    })
+signInAnonymously(auth)
+    .then(() => {})
     .catch((error) => {
         console.error("匿名ログインに失敗しました:", error);
     });
@@ -44,61 +145,106 @@ const ansSound = new Audio("sound/ans.mp3")
 const correctSound = new Audio("sound/correct.mp3")
 const wrongSound = new Audio("sound/wrong.mp3")
 
-document.querySelectorAll(".customSelect").forEach(customSelect => {
 
-    const selected = customSelect.querySelector(".selected")
-    const options = customSelect.querySelectorAll(".option")
-    const hiddenInput = customSelect.querySelector("input")
+function initRuleUI() {
+    const ruleSelect = document.getElementById("ruleSelect");
+    const selectedRuleName = document.getElementById("selectedRuleName");
+    const ruleOptionsContainer = document.getElementById("ruleOptions");
 
-    selected.addEventListener("click", () => {
+    if (!ruleSelect || !selectedRuleName || !ruleOptionsContainer) return;
 
-        document.querySelectorAll(".customSelect").forEach(el => {
-            if (el !== customSelect) {
-                el.classList.remove("open")
-            }
-        })
-        customSelect.classList.toggle("open")
-    })
+    ruleOptionsContainer.innerHTML = "";
 
-    options.forEach(option => {
+    gameRules.forEach((rule, index) => {
+        const option = document.createElement("div");
+        option.className = "option";
+        option.dataset.value = rule.id;
+        option.textContent = rule.ruleName;
 
-        option.addEventListener("click", () => {
+        option.addEventListener("click", (e) => {
+            e.stopPropagation();
 
-            const text = option.textContent
-            const value = option.dataset.value
+            ruleOptionsContainer.querySelectorAll(".option").forEach(o => o.classList.remove("selectedOption"));
+            option.classList.add("selectedOption");
 
-            selected.textContent = text
+            selectRule(rule);
 
-            if (hiddenInput) {
-                hiddenInput.value = value
-            }
+            ruleSelect.classList.remove("open");
+        });
 
-            options.forEach(o => {
-                o.classList.remove("selectedOption")
-            })
+        ruleOptionsContainer.appendChild(option);
+    });
 
-            option.classList.add("selectedOption")
+    selectedRuleName.addEventListener("click", (e) => {
+        e.stopPropagation();
+        ruleSelect.classList.toggle("open");
+    });
 
-            customSelect.classList.remove("open")
-        })
+    if (gameRules.length > 2) {
+        const defaultOption = ruleOptionsContainer.children[2];
+        if (defaultOption) {
+            defaultOption.classList.add("selectedOption");
+            selectRule(gameRules[2]);
+        }
+    }
+}
 
-    })
+$('#checkFreeze').on('change', function() {
+    if (!isHost) return;
+    const isChecked = $(this).is(':checked');
 
-})
+});
 
-document.addEventListener("click", (e) => {
+function selectRule(rule) {
+    const selectedRuleName = document.getElementById("selectedRuleName");
+    const ruleTypeInput = document.getElementById("ruleType");
+    const ruleOverviewText = document.getElementById("ruleOverviewText");
+    const parametersContainer = document.getElementById("parametersContainer");
 
+    if (selectedRuleName) selectedRuleName.textContent = rule.ruleName;
+    if (ruleTypeInput) ruleTypeInput.value = rule.id;
+    if (ruleOverviewText) ruleOverviewText.textContent = rule.ruleOverView;
+    if (parametersContainer) parametersContainer.innerHTML = ""; // 前のパラメータを消去
 
-    document.querySelectorAll(".customSelect").forEach(customSelect => {
+    if (!rule.parameters) return;
 
-        if (!customSelect.contains(e.target)) {
-            customSelect.classList.remove("open")
+    rule.parameters.forEach(param => {
+        const text = param.text;
+        const value = param.default !== undefined ? param.default : "";
+        const pos = param.inputPosition;
+
+        const inputField = `
+            <div class="settingInput" style="--inputBoxWidth:100px">
+                <input id="input_${param.id}" value="${value}">
+            </div>
+        `;
+
+        let html = `<div class="settingItem-left">`;
+
+        if (pos === "front") {
+            html += `${inputField}<p class="settingLabel" style="margin-left:10px;">${text}</p>`;
+        } else if (pos === "back") {
+            html += `<p class="settingLabel" style="margin-right:10px;">${text}</p>${inputField}`;
+        } else if (typeof pos === "number") {
+            const textBefore = text.slice(0, pos);
+            const textAfter = text.slice(pos);
+
+            if (textBefore) html += `<p class="settingLabel" style="margin-right:10px;">${textBefore}</p>`;
+            html += inputField;
+            if (textAfter) html += `<p class="settingLabel" style="margin-left:10px;">${textAfter}</p>`;
         }
 
-    })
+        html += `</div>`;
+        parametersContainer.insertAdjacentHTML("beforeend", html);
+    });
+}
 
-})
-
+document.addEventListener("click", (e) => {
+    const ruleSelect = document.getElementById("ruleSelect");
+    if (ruleSelect && !ruleSelect.contains(e.target)) {
+        ruleSelect.classList.remove("open");
+    }
+});
 
 const nameInputModal = document.getElementById("nameInputModal")
 const playerNameInput = document.getElementById("playerNameInput")
@@ -112,12 +258,36 @@ onValue(ref(db, `rooms/${roomId}`), (snapshot) => {
     const myUid = auth.currentUser ? auth.currentUser.uid : null;
     if (roomData.hostUid && myUid && roomData.hostUid === myUid) {
         isHost = true;
-        console.log("🟢 ホストとして判定されました");
     }
+
+    const Qnum = roomData.nowQNum
+
+    if(!roomData.quizList || roomData.quizList.length == 0){
+        $(".noQ").show();
+        $(".question-box").hide();
+    }else{
+        $(".noQ").hide();
+        $(".question-box").show();
+
+        $("#totalQ").text(roomData.quizList.length)
+
+        if(Qnum == 0){
+            $(".q0").show();
+            $(".question-box").hide();
+        }else{
+            $(".q0").hide();
+            $(".question-box").show();
+
+            $("#qText").text(roomData.quizList[Qnum].q)
+            $("#ansText").text(roomData.quizList[Qnum].ans)
+        }
+    }
+
+    $("#currentQ").text(Qnum)
+
 });
 
 entrySubmitBtn.addEventListener("click", () => {
-
     const enteredName = playerNameInput.value.trim()
     if (enteredName === "") {
         alert("名前を入力してください。")
@@ -125,7 +295,6 @@ entrySubmitBtn.addEventListener("click", () => {
     }
     localStorage.setItem("qitPlayerName", enteredName)
     nameInputModal.classList.remove("active")
-
 
     const savedPlayerId = localStorage.getItem("qitPlayerUUID")
     if (!savedPlayerId) {
@@ -154,61 +323,20 @@ entrySubmitBtn.addEventListener("click", () => {
     }
 
     console.log("initital")
-
     setPlayerData()
 
     try {
         set(path, iPlayerData)
     } catch (error) { }
-
 })
-
-// playerNameInput.addEventListener("keypress", (e) => {
-//     if (e.key === "Enter") {
-//         entrySubmitBtn.click()
-//     }
-// })
 
 function copy() {
     const targetCode = document.getElementById("roomidText")
-    navigator.clipboard.writeText(targetCode)
+    navigator.clipboard.writeText(targetCode.textContent)
 }
 
 let playedAnsSound = false;
-
-
-
 let lastPlayedActionId = "";
-
-// onValue(ref(db, `rooms/${roomId}/hostAction`), (snapshot) => {
-//     const hostData = snapshot.val();
-//     if (!hostData || !hostData.timestamp) return; 
-
-//     const currentActionId = `${hostData.action}_${hostData.timestamp}`;
-//     if (lastPlayedActionId === currentActionId) {
-//         return; 
-//     }
-
-//     if (hostData.action === "wrong") {
-//         console.log("★本当のWrong検知");
-//         lastPlayedActionId = currentActionId;
-
-//         wrongSound.currentTime = 0;
-//         wrongSound.play()
-//             .then(() => console.log("🔊 Wrongサウンドの再生に成功しました！"))
-//             .catch(e => console.error("❌ Wrongサウンドの再生に失敗:", e));
-//     }
-
-//     if (hostData.action === "correct") {
-//         console.log("★本当のCorrect検知");
-//         lastPlayedActionId = currentActionId;
-
-//         correctSound.currentTime = 0;
-//         correctSound.play()
-//             .then(() => console.log("🔊 Correctサウンドの再生に成功しました！"))
-//             .catch(e => console.error("❌ Correctサウンドの再生に失敗:", e));
-//     }
-// });
 
 function setPlayerData(playersData) {
     const mainObjContainer = document.querySelector('.mainObj');
@@ -238,15 +366,15 @@ function setPlayerData(playersData) {
 
 document.addEventListener('DOMContentLoaded', (event) => {
     const roomidtext = document.getElementById('roomidText');
-    roomidtext.textContent = roomId
+    if (roomidtext) roomidtext.textContent = roomId;
 
     const savedName = localStorage.getItem("qitPlayerName")
-
-    if (savedName) {
+    if (savedName && playerNameInput) {
         playerNameInput.value = savedName
     }
 
-    nameInputModal.classList.add("active")
+    if (nameInputModal) nameInputModal.classList.add("active");
+    initRuleUI();
 });
 
 function updatePlayerSvg(svgDoc, playerId, player) {
@@ -258,22 +386,20 @@ function updatePlayerSvg(svgDoc, playerId, player) {
     const oCount = svgDoc.getElementById('oCount');
     const xCount = svgDoc.getElementById('xCount');
 
-    oCount.textContent = player.o
-    xCount.textContent = player.x
+    if (oCount) oCount.textContent = player.o;
+    if (xCount) xCount.textContent = player.x;
 
-
-    if (player.isWon) {
-        svgDoc.getElementById('won').classList.remove("hidden");
-    } else {
-        svgDoc.getElementById('won').classList.add("hidden");
+    const wonEl = svgDoc.getElementById('won');
+    if (wonEl) {
+        if (player.isWon) wonEl.classList.remove("hidden");
+        else wonEl.classList.add("hidden");
     }
 
-    if (player.isLost) {
-        svgDoc.getElementById('lost').classList.remove("hidden");
-    } else {
-        svgDoc.getElementById('lost').classList.add("hidden");
+    const lostEl = svgDoc.getElementById('lost');
+    if (lostEl) {
+        if (player.isLost) lostEl.classList.remove("hidden");
+        else lostEl.classList.add("hidden");
     }
-
 
     if (player.rank != 0) {
         const rankColor = ["#edc500", "#939393", "#c97c2a", "#282828"];
@@ -296,8 +422,6 @@ function getOrdinal(n) {
         v = n % 100;
     return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
-
-
 
 let currentPlayersData = {};
 
@@ -348,7 +472,6 @@ window.addEventListener('keydown', (event) => {
 });
 
 $(document).on("click", ".correctButton, .wrongButton, .throughButton", function () {
-
     this.blur();
 
     const activePlayerId = Object.keys(currentPlayersData).find(
@@ -417,12 +540,11 @@ document.getElementById("csvFileInput").addEventListener("change", function (eve
             }
         }
 
-
         const quizListRef = ref(db, `rooms/${roomId}/quizList`);
 
         set(quizListRef, quizList)
             .then(() => {
-                alert(`確認: ${qCount - 1}問のクイズを正常に読み込みました！`);
+                alert(`${qCount - 1}問のクイズを読み込みました。`);
                 document.getElementById("totalQ").textContent = qCount - 1;
             })
             .catch((error) => {
@@ -433,9 +555,7 @@ document.getElementById("csvFileInput").addEventListener("change", function (eve
     reader.readAsText(file, "UTF-8");
 });
 
-
 $(document).ready(function () {
-
     $(document).on('change', 'input[type="checkbox"][data-target]', function () {
         const targetSelector = $(this).data('target');
         const $targetElement = $(targetSelector);
@@ -455,5 +575,4 @@ $(document).ready(function () {
             $(targetSelector).hide();
         }
     });
-
 });

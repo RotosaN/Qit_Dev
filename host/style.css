@@ -6,6 +6,11 @@ body {
 }
 
 @font-face {
+    font-family: 'GenLight';
+    src: url('../media/font/GenInterfaceJP-Light.woff') format('woff');
+}
+
+@font-face {
     font-family: 'GenMid';
     src: url('../media/font/GenInterfaceJP-Medium.woff') format('woff');
 }
@@ -22,6 +27,15 @@ body {
 }
 
 .noQ{
+    display: none;
+    font-family: "GenMid";
+    text-align: center;
+    transform: tranlateY(-50%);
+    color: #0000007a;
+}
+
+.q0{
+    display: none;
     font-family: "GenMid";
     text-align: center;
     transform: tranlateY(-50%);
@@ -125,6 +139,8 @@ body {
     justify-content: space-between;
     align-items: stretch;
     gap: 15px;
+    height: auto;
+    min-height: 120px;
 }
 
 .infoSide {
@@ -339,6 +355,13 @@ body {
     font-weight: 800;
     font-style: italic;
     font-size: 1.5rem;
+}
+
+.ruleOverview {
+    width: 90%;
+    margin: 0 auto;
+    font-family: "GenLight";
+    color: #0000006f;
 }
 
 .settingItem {
