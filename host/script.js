@@ -24,13 +24,13 @@ let currentUid = null;
 const gameRules = [
     {
         ruleName: "Free ○×",
-        id: "free",
+        id: "freeox",
         ruleOverView: "勝利条件なし、○と×の数が記録されるルールです。",
         playerCard: "ox"
     },
     {
         ruleName: "Free Point",
-        id: "free",
+        id: "freepoint",
         ruleOverView: "勝利条件なし、ポイントが記録されるルールです。",
         playerCard: "point",
         parameters: [
@@ -61,7 +61,7 @@ const gameRules = [
     },
     {
         ruleName: "X by Y",
-        id: "nbym",
+        id: "xbyy",
         ruleOverView: "正解で加点されるXに、誤答で減点されるYを乗じた数Zがスコアになるルールです。Yが0になると失格します。",
         playerCard: "xyz",
         parameters: [
@@ -215,7 +215,7 @@ function selectRule(rule) {
 
         const inputField = `
             <div class="settingInput" style="--inputBoxWidth:100px">
-                <input id="input_${param.id}" value="${value}">
+                <input id="input_${param.id}" value="${value}" class="inputGameruleValue">
             </div>
         `;
 
@@ -311,8 +311,9 @@ entrySubmitBtn.addEventListener("click", () => {
         point: 0,
         life: 0,
         boardans: false,
-        x: 0,
-        y: 0,
+        scorex: 0,
+        scorey: 0,
+        scorez: 0,
         freeze: 0,
         isPushing: false,
         pushedAt: 0,
@@ -363,6 +364,14 @@ function setPlayerData(playersData) {
         }
     });
 }
+
+$('#parametersContainer').on('change', '.inputGameruleValue', function(e) {
+
+    const hasId = this.id.replace("input_","")
+
+    
+});
+
 
 document.addEventListener('DOMContentLoaded', (event) => {
     const roomidtext = document.getElementById('roomidText');

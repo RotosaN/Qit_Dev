@@ -58,14 +58,12 @@ createBtn.onclick = async () => {
         status: "waiting",
         createdAt: Date.now(),
         roomRule: {
-            rule: "ox",
-            ansRule: "push",
-            winO: 7,
-            lostX: 3,
+            rule: "freeox",
+            playerCard: "ox",
             winPoint: false,
             customRule: {
-                correct: { o: 1 },
-                incorrect: { x: 1 }
+                wonO: 7,
+                lostX: 3,
             }
         },
         quizList: {},

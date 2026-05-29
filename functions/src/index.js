@@ -3,9 +3,9 @@ const admin = require("firebase-admin");
 
 admin.initializeApp();
 
-exports.checkBuzzer = onValueUpdated({ 
-    region: "asia-southeast1", 
-    ref: "/rooms/{roomId}/player/{playerId}" 
+exports.checkBuzzer = onValueUpdated({
+    region: "asia-southeast1",
+    ref: "/rooms/{roomId}/player/{playerId}"
 }, async (event) => {
     const db = admin.database();
     const { roomId, playerId } = event.params;
@@ -16,7 +16,7 @@ exports.checkBuzzer = onValueUpdated({
     if (!afterData || afterData.isPushing !== true) return null;
     if (beforeData && beforeData.isPushing === true) return null;
     if (afterData.rank !== 0) return null;
-    if (beforeData && ( beforeData.isLost || beforeData.isWon || beforeData.freeze >= 1)) return null;
+    if (beforeData && (beforeData.isLost || beforeData.isWon || beforeData.freeze >= 1)) return null;
 
     const roomPlayersRef = db.ref(`rooms/${roomId}/player`);
 
@@ -39,9 +39,9 @@ exports.checkBuzzer = onValueUpdated({
     return null;
 });
 
-exports.onHostAction = onValueUpdated({ 
-    region: "asia-southeast1", 
-    ref: "/rooms/{roomId}/hostAction" 
+exports.onHostAction = onValueUpdated({
+    region: "asia-southeast1",
+    ref: "/rooms/{roomId}/hostAction"
 }, async (event) => {
     const db = admin.database();
     const { roomId } = event.params;
@@ -59,15 +59,53 @@ exports.onHostAction = onValueUpdated({
         await playerRef.transaction((player) => {
             if (!player) return player;
 
-            if (ruleData && ruleData.rule == "ox") {
-                player.o = (player.o || 0) + 1;
-                if (ruleData.winO <= player.o) {
-                    player.isWon = true;
-                }
+            const params = ruleData.customRule
+
+            switch (ruleData.rule) {
+
+                case "freeox": {
+
+                    player.o = (player.o || 0) + 1;
+
+                } break
+
+                case "freepoint": {
+
+                    player.point = (player.point || 0) + params.correctPoint;
+
+                } break
+
+                case "nomx": {
+
+                    player.o = (player.o || 0) + 1;
+                    if (ruleData.wonO <= player.o) {
+                        player.isWon = true;
+                    }
+
+                } break
+
+                case "npmm": {
+
+                    player.point = (player.point || 0) + params.correctPoint;
+                    if (ruleData.wonPoint <= player.point) {
+                        player.isWon = true;
+                    }
+
+                } break
+
+                case "xbyy": {
+
+                    player.scorex = (player.scorex || 0) + correctX;
+                    player.scorez = player.scorex * player.scorey
+                    
+
+                } break
+
             }
+
             return player;
         });
-    } 
+    }
 
     else if (action === "wrong" && targetPlayerId && targetPlayerId !== "none") {
         const playerRef = db.ref(`rooms/${roomId}/player/${targetPlayerId}`);
@@ -75,14 +113,51 @@ exports.onHostAction = onValueUpdated({
         const ruleData = ruleSnapshot.exists() ? ruleSnapshot.val() : null;
 
         await playerRef.transaction((player) => {
+            
             if (!player) return player;
 
-            if (ruleData && ruleData.rule == "ox") {
-                player.x = (player.x || 0) + 1;
-                if (ruleData.lostX <= player.x) {
-                    player.isLost = true;
-                }
+            const params = ruleData.customRule
+
+            switch (ruleData.rule) {
+
+                case "freeox": {
+
+                    player.x = (player.x || 0) + 1;
+
+                } break
+
+                case "freepoint": {
+
+                    player.point = (player.point || 0) + params.wrongPoint;
+
+                } break
+
+                case "nomx": {
+
+                    player.x = (player.x || 0) + 1;
+                    if (ruleData.lostX <= player.x) {
+                        player.isLost = true;
+                    }
+
+                } break
+
+                case "npmm": {
+
+                    player.point = (player.point || 0) + params.wrongPoint;
+
+                } break
+
+                case "xbyy": {
+
+                    player.scorey = (player.scorey || 0) + wrongY;
+                    player.scorez = player.scorex * player.scorey
+                    
+
+                } break
+
             }
+
+
             return player;
         });
     }

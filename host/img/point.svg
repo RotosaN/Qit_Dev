@@ -35,7 +35,7 @@
 
       .cls-2 {
         font-family: GenMid;
-        font-size: 55px;
+        font-size: 90px;
       }
 
       .cls-8 {
@@ -132,12 +132,7 @@
   <text class="cls-3 playerName" transform="translate(113.465 148.69)" text-anchor="middle"
     id="playerName" fill="#000000">TESTPLAYER</text>
   <g>
-    <text class="cls-2" transform="translate(67.465 278.93)" text-anchor="middle" id="oCount">0</text>
-    <path class="cls-4"
-      d="M68.83,175.09c-7.86,0-14.23,6.37-14.23,14.23s6.37,14.23,14.23,14.23,14.23-6.37,14.23-14.23-6.37-14.23-14.23-14.23ZM68.83,199.51c-5.63,0-10.2-4.57-10.2-10.2s4.57-10.2,10.2-10.2,10.2,4.57,10.2,10.2-4.57,10.2-10.2,10.2Z" />
-    <polygon class="cls-4"
-      points="170.51 179.43 167.41 176.33 158.1 185.64 148.79 176.33 145.69 179.43 155 188.74 145.69 198.05 148.79 201.15 158.1 191.84 167.41 201.15 170.51 198.05 161.2 188.74 170.51 179.43" />
-    <text class="cls-2" transform="translate(159.465 278.93)" text-anchor="middle" id="xCount">0</text>
+    <text class="cls-2" transform="translate(113.465 270)" text-anchor="middle" id="pointCount">0</text>
   </g>
   <path class="cls-5" d="M191.13,47.97h33.14c1.47,0,2.67,1.19,2.67,2.67v31.12h-35.8v-33.78h0Z" />
   <path class="cls-11" d="M120.41,47.91h70.72v33.78h-77.66v-26.84c0-3.83,3.11-6.94,6.94-6.94Z" />

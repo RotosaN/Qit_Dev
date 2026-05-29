@@ -248,6 +248,8 @@ body {
 #settingsScreen {
     background-color: #f2f2f2;
     width: 320px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 #settingTitle {
@@ -325,6 +327,10 @@ body {
     transform: translateY(-10px);
     transition: 0.2s;
     z-index: 100;
+    overscroll-behavior: none;
+    max-height: 250px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .customSelect.open .options {
