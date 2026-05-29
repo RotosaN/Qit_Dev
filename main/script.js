@@ -37,7 +37,6 @@ onAuthStateChanged(auth, (user) => {
 });
 
 const createBtn = document.getElementById('makeRoomBtn');
-const roomCodeInput = document.getElementById('roomCode');
 
 createBtn.onclick = async () => {
     const roomId = Math.floor(10000 + Math.random() * 90000).toString();
