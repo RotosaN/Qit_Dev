@@ -78,7 +78,7 @@ exports.onHostAction = onValueUpdated({
                 case "nomx": {
 
                     player.o = (player.o || 0) + 1;
-                    if (ruleData.wonO <= player.o) {
+                    if (params.wonO <= player.o) {
                         player.isWon = true;
                     }
 
@@ -87,7 +87,7 @@ exports.onHostAction = onValueUpdated({
                 case "npmm": {
 
                     player.point = (player.point || 0) + params.correctPoint;
-                    if (ruleData.wonPoint <= player.point) {
+                    if (params.wonPoint <= player.point) {
                         player.isWon = true;
                     }
 
@@ -95,7 +95,7 @@ exports.onHostAction = onValueUpdated({
 
                 case "xbyy": {
 
-                    player.scorex = (player.scorex || 0) + correctX;
+                    player.scorex = (player.scorex || 0) + params.correctX;
                     player.scorez = player.scorex * player.scorey
                     
 
@@ -135,7 +135,7 @@ exports.onHostAction = onValueUpdated({
                 case "nomx": {
 
                     player.x = (player.x || 0) + 1;
-                    if (ruleData.lostX <= player.x) {
+                    if (params.lostX <= player.x) {
                         player.isLost = true;
                     }
 
@@ -149,7 +149,7 @@ exports.onHostAction = onValueUpdated({
 
                 case "xbyy": {
 
-                    player.scorey = (player.scorey || 0) + wrongY;
+                    player.scorey = (player.scorey || 0) + params.wrongY;
                     player.scorez = player.scorex * player.scorey
                     
 

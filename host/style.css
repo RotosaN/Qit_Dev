@@ -20,12 +20,6 @@ body {
     src: url('../media/font/GenInterfaceJP-Bold.woff') format('woff');
 }
 
-.hostButtons{
-    width: 65%;
-    height: 80%;
-    margin: 0 auto;
-}
-
 .noQ{
     display: none;
     font-family: "GenMid";
@@ -41,73 +35,86 @@ body {
     transform: tranlateY(-50%);
     color: #0000007a;
 }
-
-.correctButton .material-symbols-outlined {
-  font-size: 34px;
+.hostButtons {
+    width: 65%;
+    height: 80%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    display: none;
 }
 
-.wrongButton .material-symbols-outlined {
-  font-size: 34px;
-}
-
-.throughButton .material-symbols-outlined {
-  font-size: 34px;
-}
-
-.correctButton:active{
-    transform: translateY(6px);
-    box-shadow: 0 2px 0 #cb3030;
-}
-
-.wrongButton:active{
-    transform: translateY(6px);
-    box-shadow: 0 2px 0 #3038c9;
-}
-
-
-.throughButton:active{
-    transform: translateY(6px);
-    box-shadow: 0 2px 0 #a2a2a2;
-}
-
-
-.judgeSubtext {
-    font-family: "GenMid";
-    color: #ffffffa4;
-}
-
-.throughButton .judgeSubtext {
-    color: #000000a4;
+.correctButton,
+.wrongButton {
+    width: 38%;
+    height: 70%;
+    border: 0px solid #d9d9d900;
+    border-radius: 10px;
+    color: #fff;
+    cursor: pointer;
 }
 
 .correctButton {
-    width: 35%;
-    height: 70%;
-    border: 0px solid #d9d9d900;
     background-color: #ff3d3d;
-    color: #fff;
     box-shadow: 0 8px 0 #cb3030;
-    border-radius: 10px;
 }
 
 .wrongButton {
-    width: 35%;
-    height: 70%;
-    border: 0px solid #d9d9d900;
     background-color: #3d47ff;
-    color: #fff;
     box-shadow: 0 8px 0 #3038c9;
-    border-radius: 10px;
 }
 
-.throughButton{
-    width: 15%;
+.sideButtons {
+    width: 20%;
     height: 70%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.throughButton,
+.resetButton {
+    width: 100%;
+    height: calc(50% - 6px);
     border: 0px solid #d9d9d900;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.throughButton {
     background-color: #c4c4c4;
     color: #000000;
-    box-shadow: 0 8px 0 #a2a2a2;
-    border-radius: 10px;
+    box-shadow: 0 4px 0 #a2a2a2;
+}
+
+.resetButton {
+    background-color: #555555;
+    color: #ffffff;
+    box-shadow: 0 4px 0 #333333;
+}
+
+.resetButton .judgeSubtext {
+    color: #ffffffa4;
+}
+
+.correctButton:active,
+.wrongButton:active {
+    transform: translateY(6px);
+    box-shadow: 0 2px 0 var(--shadow-color);
+}
+.correctButton:active { box-shadow: 0 2px 0 #cb3030; }
+.wrongButton:active { box-shadow: 0 2px 0 #3038c9; }
+
+.throughButton:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #a2a2a2;
+}
+.resetButton:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #333333;
 }
 
 .main {

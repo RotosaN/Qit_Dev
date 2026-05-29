@@ -40,7 +40,7 @@ const gameRules = [
     },
     {
         ruleName: "N○M×",
-        id: "nonx",
+        id: "nomx",
         ruleOverView: "N○に達したら勝ち抜け、M×に達すると失格する、基本的なルールです。",
         playerCard: "ox",
         parameters: [
@@ -338,6 +338,48 @@ function copy() {
 
 let playedAnsSound = false;
 let lastPlayedActionId = "";
+
+$('#submit').click(function() {
+    console.log('ルール適用ボタンがクリックされました！');
+
+    if (!isHost) {
+        return;
+    }
+
+    const currentRuleId = $('.selectedOption').data('value'); 
+    
+    if (!currentRuleId) {
+        alert("ルールが選択されていません。");
+        return;
+    }
+
+    const ruleParameters = {};
+    
+    $('#parametersContainer .inputGameruleValue').each(function() {
+        const fullId = $(this).attr('id');
+        const paramKey = fullId.replace('input_', '');
+        const paramValue = Number($(this).val());
+        
+        ruleParameters[paramKey] = paramValue;
+    });
+
+    const updateData = {
+        rule: currentRuleId,
+        customRule: ruleParameters
+    };
+
+    const roomRef = ref(db, `rooms/${roomId}/roomRule`);
+    
+    update(roomRef, updateData)
+        .then(() => {
+            console.log('Firebaseへのルール適用が成功しました！', updateData);
+            alert('ルールを適用しました！');
+        })
+        .catch((error) => {
+            console.error('Firebaseへの書き込みに失敗しました:', error);
+            alert('ルールの適用に失敗しました。');
+        });
+});
 
 function setPlayerData(playersData) {
     const mainObjContainer = document.querySelector('.mainObj');
