@@ -95,30 +95,30 @@
                 <div class="mainObj">
                 </div>
                 <div class="buzzerArea">
-                                        <div class="buttonObj">
-                    <object data="img/button2d.svg" type="image/svg+xml" class="buzzerBtn"></object>
-                    <span class="keybind">Space</span><span class="keybind">Enter</span>で早押し
+                    <div class="buttonObj">
+                        <object data="img/button2dv2.svg" type="image/svg+xml" class="buzzerBtn"></object>
+                        <span class="keybind">Space</span><span class="keybind">Enter</span>で早押し
                     </div>
                     <div class="hostButtons">
-                        <button class="correctButton">
+                        <button class="correctButton hostbutton">
                             <span class="material-symbols-outlined">circle</span>
                             <br>
                             <span class="judgeSubtext">正解</span>
                         </button>
 
-                        <button class="wrongButton">
+                        <button class="wrongButton hostbutton">
                             <span class="material-symbols-outlined">close</span>
                             <br>
                             <span class="judgeSubtext">不正解</span>
                         </button>
 
                         <div class="sideButtons">
-                            <button class="throughButton">
+                            <button class="throughButton hostbutton">
                                 <span class="material-symbols-outlined">arrow_forward</span>
                                 <br>
                                 <span class="judgeSubtext">次の問題</span>
                             </button>
-                            <button class="resetButton">
+                            <button class="resetButton hostbutton">
                                 <span class="material-symbols-outlined">history</span>
                                 <br>
                                 <span class="judgeSubtext">早押しリセット</span>
@@ -128,6 +128,11 @@
                 </div>
             </div>
             <div id="settingsScreen">
+
+                                <button id="toggleSettingsBtn">
+                    <span class="material-symbols-outlined">history</span>
+                </button>
+                
                 <div id="settingContent">
                     <h3 id="settingTitle">SETTINGS</h3>
                     <p class="configLabel">部屋の設定 <span class="settingLabelEng">ROOM CONFIG</span></p>
@@ -164,11 +169,12 @@
                         <span id="file-name-display" class="file-name-text">選択されていません</span>
                     </div>
 
-                    <p class="configLabel">ゲームルール <span class="settingLabelEng">GAME RULE</span><button id="submit">a</button></p>
+                    <p class="configLabel">ゲームルール <span class="settingLabelEng">GAME RULE</span><button
+                            id="submit">a</button></p>
                     <div class="customSelect" id="ruleSelect">
                         <div class="selected" id="selectedRuleName">ルールの選択</div>
                         <div class="options" id="ruleOptions">
-                            </div>
+                        </div>
                         <input type="hidden" id="ruleType" value="">
                     </div>
 

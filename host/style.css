@@ -24,7 +24,6 @@ body {
     display: none;
     font-family: "GenMid";
     text-align: center;
-    transform: tranlateY(-50%);
     color: #0000007a;
 }
 
@@ -43,6 +42,9 @@ body {
     justify-content: space-between;
     align-items: center;
     gap: 15px;
+}
+
+.hostPanel{
     display: none;
 }
 

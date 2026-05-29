@@ -162,6 +162,10 @@ exports.onHostAction = onValueUpdated({
         });
     }
 
+    else if (action === "through") {
+        
+    }
+
     const playersRef = db.ref(`rooms/${roomId}/player`);
     const snapshot = await playersRef.get();
     const playersData = snapshot.val();

@@ -260,6 +260,14 @@ onValue(ref(db, `rooms/${roomId}`), (snapshot) => {
         isHost = true;
     }
 
+    if (!isHost) {
+        $("#settingsScreen").remove();
+        $(".hostbutton").hide()
+    }else{
+        $(".buttonObj").hide()
+        $(".hostbutton").show()
+    }
+
     const Qnum = roomData.nowQNum
 
     if(!roomData.quizList || roomData.quizList.length == 0){
@@ -317,7 +325,7 @@ entrySubmitBtn.addEventListener("click", () => {
         freeze: 0,
         isPushing: false,
         pushedAt: 0,
-        isHost: false,
+        isHost: isHost,
         rank: 0,
         isWon: false,
         isLost: false
@@ -379,6 +387,37 @@ $('#submit').click(function() {
             console.error('Firebaseへの書き込みに失敗しました:', error);
             alert('ルールの適用に失敗しました。');
         });
+});
+
+$(window).on('load', function() {
+    
+    const buzzerObject = document.querySelector('.buzzerBtn');
+    if (!buzzerObject) return;
+
+    const svgDoc = buzzerObject.contentDocument;
+    if (!svgDoc) return;
+
+    const svgButton = svgDoc.getElementById('button');
+    if (!svgButton) return;
+
+    let isKeyPressed = false;
+
+
+    $(window).on('keydown', function(e) {
+        if (e.originalEvent.repeat) return;
+
+        if (e.key === ' ' || e.key === 'Enter') {
+            isKeyPressed = true;
+            svgButton.classList.add('push');
+        }
+    });
+
+    $(window).on('keyup', function(e) {
+        if (e.key === ' ' || e.key === 'Enter') {
+            isKeyPressed = false;
+            svgButton.classList.remove('push');
+        }
+    });
 });
 
 function setPlayerData(playersData) {
@@ -522,7 +561,7 @@ window.addEventListener('keydown', (event) => {
     }
 });
 
-$(document).on("click", ".correctButton, .wrongButton, .throughButton", function () {
+$(document).on("click", ".correctButton, .wrongButton, .throughButton, .resetButtom", function () {
     this.blur();
 
     const activePlayerId = Object.keys(currentPlayersData).find(
@@ -533,6 +572,7 @@ $(document).on("click", ".correctButton, .wrongButton, .throughButton", function
     if ($(this).hasClass("correctButton")) actionType = "correct";
     if ($(this).hasClass("wrongButton")) actionType = "wrong";
     if ($(this).hasClass("throughButton")) actionType = "through";
+    if ($(this).hasClass("throughButton")) actionType = "reset";
 
     if (actionType !== "through" && !activePlayerId) {
         return;
@@ -624,6 +664,21 @@ $(document).ready(function () {
             $(targetSelector).show();
         } else {
             $(targetSelector).hide();
+        }
+    });
+});
+
+$(document).ready(function() {
+
+
+    $("#toggleSettingsBtn").on("click", function(e) {
+        e.stopPropagation();
+        $("#settingsScreen").toggleClass("open");
+    });
+
+    $(document).on("click", function(e) {
+        if (!$(e.target).closest("#settingsScreen").length) {
+            $("#settingsScreen").removeClass("open");
         }
     });
 });
