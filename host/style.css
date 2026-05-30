@@ -44,6 +44,10 @@ body {
     gap: 15px;
 }
 
+.hostbutton {
+    display: none;
+}
+
 .hostPanel{
     display: none;
 }
