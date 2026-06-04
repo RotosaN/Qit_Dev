@@ -277,7 +277,7 @@ onValue(ref(db, `rooms/${roomId}`), (snapshot) => {
         $(".noQ").hide();
         $(".question-box").show();
 
-        $("#totalQ").text(roomData.quizList.length)
+        $("#totalQ").text(roomData.quizList.length-1)
 
         if(Qnum == 0){
             $(".q0").show();
