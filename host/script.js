@@ -262,10 +262,10 @@ onValue(ref(db, `rooms/${roomId}`), (snapshot) => {
 
     if (!isHost) {
         $("#settingsScreen").remove();
-        $(".hostButtons").remove()
+        $(".hostbutton").hide()
     }else{
-        $("#settingsScreen").remove();
-        $(".hostButtons").add()
+        $(".buttonObj").hide()
+        $(".hostbutton").show()
     }
 
     const Qnum = roomData.nowQNum
