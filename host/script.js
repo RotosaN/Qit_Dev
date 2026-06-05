@@ -265,7 +265,7 @@ onValue(ref(db, `rooms/${roomId}`), (snapshot) => {
         $(".hostButtons").remove()
     }else{
         $("#settingsScreen").remove();
-        $(".hostButtons").remove()
+        $(".hostButtons").add()
     }
 
     const Qnum = roomData.nowQNum
