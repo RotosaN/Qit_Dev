@@ -262,7 +262,7 @@ onValue(ref(db, `rooms/${roomId}`), (snapshot) => {
 
     if (!isHost) {
         $("#settingsScreen").remove();
-        $(".hostbutton").remove()
+        $(".hostButtons").remove()
     }else{
         $(".buttonObj").remove()
         $(".hostbutton").show()
