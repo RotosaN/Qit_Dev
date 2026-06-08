@@ -527,7 +527,7 @@ onValue(ref(db, `rooms/${roomId}/player`), (snapshot) => {
     const hasRankOne = Object.values(playersData).some(player => player.rank == 1);
 
     if (hasRankOne) {
-        if (!playedAnsSound) {
+        if (!playedAnsSound && !firstPlayer) {
             ansSound.currentTime = 0;
             ansSound.play();
             playedAnsSound = true;
@@ -615,6 +615,7 @@ $(document).on("click", ".correctButton, .wrongButton, .throughButton, .resetBut
 
 const hostActionRef = ref(db, `rooms/${roomId}/hostAction`);
 let lastSoundTimestamp = 0;
+
 onValue(hostActionRef, (snapshot) => {
     const data = snapshot.val();
     if (!data) return;
