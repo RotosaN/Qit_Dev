@@ -633,12 +633,14 @@ onValue(hostActionRef, (snapshot) => {
             correctSound.currentTime = 0;
             correctSound.play().catch(e => console.log("自動再生ブロック:", e));
             firstPlayer = false
+            playedAnsSound = false
         } break;
 
         case "wrong": {
             wrongSound.currentTime = 0;
             wrongSound.play().catch(e => console.log("自動再生ブロック:", e));
             firstPlayer = false
+            playedAnsSound = false
         } break;
         
     }
