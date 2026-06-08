@@ -47,143 +47,79 @@ exports.onHostAction = onValueUpdated({
     const { roomId } = event.params;
 
     const actionData = event.data.after.val();
-    if (!actionData || !actionData.timestamp) return null;
+    if (!actionData || !actionData.timestamp || actionData.action === "idle") return null;
 
     const { action, targetPlayerId } = actionData;
 
-    if (action === "correct" && targetPlayerId && targetPlayerId !== "none") {
+    if ((action === "correct" || action === "wrong") && targetPlayerId && targetPlayerId !== "none") {
         const playerRef = db.ref(`rooms/${roomId}/player/${targetPlayerId}`);
         const ruleSnapshot = await db.ref(`rooms/${roomId}/roomRule`).get();
         const ruleData = ruleSnapshot.exists() ? ruleSnapshot.val() : null;
 
-        await playerRef.transaction((player) => {
-            if (!player) return player;
+        if (ruleData && ruleData.customRule) {
+            await playerRef.transaction((player) => {
+                if (!player) return player;
+                const params = ruleData.customRule;
 
-            const params = ruleData.customRule
-
-            switch (ruleData.rule) {
-
-                case "freeox": {
-
-                    player.o = (player.o || 0) + 1;
-
-                } break
-
-                case "freepoint": {
-
-                    player.point = (player.point || 0) + params.correctPoint;
-
-                } break
-
-                case "nomx": {
-
-                    player.o = (player.o || 0) + 1;
-                    if (params.wonO <= player.o) {
-                        player.isWon = true;
+                if (action === "correct") {
+                    switch (ruleData.rule) {
+                        case "freeox": player.o = (player.o || 0) + 1; break;
+                        case "freepoint": player.point = (player.point || 0) + (params.correctPoint || 0); break;
+                        case "nomx": 
+                            player.o = (player.o || 0) + 1;
+                            if (params.wonO <= player.o) player.isWon = true;
+                            break;
+                        case "npmm":
+                            player.point = (player.point || 0) + (params.correctPoint || 0);
+                            if (params.wonPoint <= player.point) player.isWon = true;
+                            break;
+                        case "xbyy":
+                            player.scorex = (player.scorex || 0) + (params.correctX || 0);
+                            player.scorez = player.scorex * (player.scorey || 0);
+                            break;
                     }
-
-                } break
-
-                case "npmm": {
-
-                    player.point = (player.point || 0) + params.correctPoint;
-                    if (params.wonPoint <= player.point) {
-                        player.isWon = true;
+                } else if (action === "wrong") {
+                    switch (ruleData.rule) {
+                        case "freeox": player.x = (player.x || 0) + 1; break;
+                        case "freepoint": player.point = (player.point || 0) + (params.lostX || 0); break; // フロントの引数名 lostX に合わせる
+                        case "nomx":
+                            player.x = (player.x || 0) + 1;
+                            if (params.lostX <= player.x) player.isLost = true;
+                            break;
+                        case "npmm":
+                            player.point = (player.point || 0) + (params.lostX || 0); // フロントの引数名 lostX に合わせる
+                            break;
+                        case "xbyy":
+                            player.scorey = (player.scorey || 0) + (params.lostX || 0); // フロントの引数名 lostX に合わせる
+                            player.scorez = (player.scorex || 0) * player.scorey;
+                            break;
                     }
-
-                } break
-
-                case "xbyy": {
-
-                    player.scorex = (player.scorex || 0) + params.correctX;
-                    player.scorez = player.scorex * player.scorey
-                    
-
-                } break
-
-            }
-
-            return player;
-        });
-    }
-
-    else if (action === "wrong" && targetPlayerId && targetPlayerId !== "none") {
-        const playerRef = db.ref(`rooms/${roomId}/player/${targetPlayerId}`);
-        const ruleSnapshot = await db.ref(`rooms/${roomId}/roomRule`).get();
-        const ruleData = ruleSnapshot.exists() ? ruleSnapshot.val() : null;
-
-        await playerRef.transaction((player) => {
-            
-            if (!player) return player;
-
-            const params = ruleData.customRule
-
-            switch (ruleData.rule) {
-
-                case "freeox": {
-
-                    player.x = (player.x || 0) + 1;
-
-                } break
-
-                case "freepoint": {
-
-                    player.point = (player.point || 0) + params.wrongPoint;
-
-                } break
-
-                case "nomx": {
-
-                    player.x = (player.x || 0) + 1;
-                    if (params.lostX <= player.x) {
-                        player.isLost = true;
-                    }
-
-                } break
-
-                case "npmm": {
-
-                    player.point = (player.point || 0) + params.wrongPoint;
-
-                } break
-
-                case "xbyy": {
-
-                    player.scorey = (player.scorey || 0) + params.wrongY;
-                    player.scorez = player.scorex * player.scorey
-                    
-
-                } break
-
-            }
-
-
-            return player;
-        });
-    }
-
-    else if (action === "through") {
-        
+                }
+                return player;
+            });
+        }
     }
 
     const playersRef = db.ref(`rooms/${roomId}/player`);
     const snapshot = await playersRef.get();
     const playersData = snapshot.val();
 
+    const finalUpdates = {};
+
     if (playersData) {
-        const updates = {};
         Object.keys(playersData).forEach((playerId) => {
-            updates[`rooms/${roomId}/player/${playerId}/rank`] = 0;
-            updates[`rooms/${roomId}/player/${playerId}/isPushing`] = false;
+            finalUpdates[`rooms/${roomId}/player/${playerId}/rank`] = 0;
+            finalUpdates[`rooms/${roomId}/player/${playerId}/isPushing`] = false;
         });
-        await db.ref().update(updates);
     }
 
-    await db.ref(`rooms/${roomId}/hostAction`).update({
+    finalUpdates[`rooms/${roomId}/hostAction`] = {
         action: "idle",
         targetPlayerId: "none",
         timestamp: null
-    });
+    };
+
+    await db.ref().update(finalUpdates);
 
     return null;
 });

@@ -526,10 +526,10 @@ window.addEventListener('keydown', (event) => {
         if (isSubmitting) return;
         isSubmitting = true;
 
-        if (!playedAnsSound) {
+        if (playedAnsSound !== myId) {
             ansSound.currentTime = 0;
             ansSound.play().catch(e => console.log("自動再生ブロック:", e));
-            playedAnsSound = true;
+            playedAnsSound = myId;
         }
 
         const playerRef = ref(db, `rooms/${roomId}/player/${myId}`);
@@ -537,13 +537,14 @@ window.addEventListener('keydown', (event) => {
             isPushing: true,
             pushedAt: serverTimestamp()
         }).then(() => {
-            setTimeout(() => { isSubmitting = false; }, 1000);
+            setTimeout(() => { isSubmitting = false; }, 200); 
         }).catch(() => {
             isSubmitting = false;
         });
     }
 });
 
+let currentHostAction = "idle"; 
 
 onValue(ref(db, `rooms/${roomId}/player`), (snapshot) => {
     const playersData = snapshot.val();
@@ -558,12 +559,27 @@ onValue(ref(db, `rooms/${roomId}/player`), (snapshot) => {
         id => playersData[id] && playersData[id].rank === 1
     );
 
-    if (activePlayerId) {
-        if (activePlayerId !== myId && !playedAnsSound) {
+    if (currentHostAction !== "idle" && currentHostAction !== "reset") {
+        return; 
+    }
+
+    if (!activePlayerId) {
+        if (playedAnsSound !== "") {
+            playedAnsSound = ""; 
+        }
+        return;
+    }
+
+    const activePlayer = playersData[activePlayerId];
+
+    if (activePlayer && activePlayer.isPushing === true) {
+        
+        if (activePlayerId !== myId && playedAnsSound === "") {
             console.log("他人が押した音を再生します");
             ansSound.currentTime = 0;
             ansSound.play().catch(e => console.log("自動再生ブロック:", e));
-            playedAnsSound = true;
+            
+            playedAnsSound = activePlayerId; 
         }
     }
 });
@@ -617,6 +633,8 @@ onValue(hostActionRef, (snapshot) => {
     const data = snapshot.val();
     if (!data) return;
 
+    currentHostAction = data.action || "idle";
+
     if (!data.timestamp || data.timestamp <= lastSoundTimestamp) {
         if (data.timestamp) lastSoundTimestamp = data.timestamp;
         return;
@@ -626,23 +644,18 @@ onValue(hostActionRef, (snapshot) => {
 
     switch (data.action) {
         case "correct": {
-
-            console.log("correctSoundPlayed")
-
+            console.log("correctSoundPlayed");
             correctSound.currentTime = 0;
             correctSound.play().catch(e => console.log("自動再生ブロック:", e));
-            playedAnsSound = false;
+            playedAnsSound = ""; 
         } break;
 
         case "wrong": {
-
-            console.log("wrongSoundPlayed")
-
+            console.log("wrongSoundPlayed");
             wrongSound.currentTime = 0;
             wrongSound.play().catch(e => console.log("自動再生ブロック:", e));
-            playedAnsSound = false;
+            playedAnsSound = ""; 
         } break;
-        
     }
 });
 
