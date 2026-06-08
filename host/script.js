@@ -516,49 +516,19 @@ function getOrdinal(n) {
 
 let currentPlayersData = {};
 
-
-onValue(ref(db, `rooms/${roomId}/player`), (snapshot) => {
-    const playersData = snapshot.val();
-    if (!playersData) return;
-
-    currentPlayersData = playersData;
-    setPlayerData(playersData);
-
-    const hasRankOne = Object.values(playersData).some(player => player.rank == 1);
-
-    if (hasRankOne) {
-        if (!playedAnsSound && !firstPlayer) {
-            ansSound.currentTime = 0;
-            ansSound.play();
-            playedAnsSound = true;
-            firstPlayer = true;
-        }
-    } else {
-        playedAnsSound = false;
-    }
-});
-
-let isSubmitting = false;
-
 window.addEventListener('keydown', (event) => {
     const myId = localStorage.getItem("qitPlayerUUID");
     if (!myId || !currentPlayersData[myId]) return;
 
-    if (currentPlayersData[myId].rank !== 0) {
-        return;
-    }
+    if (currentPlayersData[myId].rank !== 0) return;
 
     if (event.key === 'Enter' && event.target.tagName !== 'INPUT') {
-        console.log("played1")
         if (isSubmitting) return;
-        console.log("played2")
         isSubmitting = true;
 
-        if(!firstPlayer){
-            console.log("played")
+        if (!playedAnsSound) {
             ansSound.currentTime = 0;
-            ansSound.play();
-            firstPlayer = true;
+            ansSound.play().catch(e => console.log("自動再生ブロック:", e));
             playedAnsSound = true;
         }
 
@@ -573,6 +543,32 @@ window.addEventListener('keydown', (event) => {
         });
     }
 });
+
+
+onValue(ref(db, `rooms/${roomId}/player`), (snapshot) => {
+    const playersData = snapshot.val();
+    if (!playersData) return;
+
+    currentPlayersData = playersData;
+    setPlayerData(playersData);
+
+    const myId = localStorage.getItem("qitPlayerUUID");
+    
+    const activePlayerId = Object.keys(playersData).find(
+        id => playersData[id] && playersData[id].rank === 1
+    );
+
+    if (activePlayerId) {
+        if (activePlayerId !== myId && !playedAnsSound) {
+            console.log("他人が押した音を再生します");
+            ansSound.currentTime = 0;
+            ansSound.play().catch(e => console.log("自動再生ブロック:", e));
+            playedAnsSound = true;
+        }
+    }
+});
+
+let isSubmitting = false;
 
 $(document).on("click", ".correctButton, .wrongButton, .throughButton, .resetButtom", function () {
     this.blur();
@@ -630,17 +626,21 @@ onValue(hostActionRef, (snapshot) => {
 
     switch (data.action) {
         case "correct": {
+
+            console.log("correctSoundPlayed")
+
             correctSound.currentTime = 0;
             correctSound.play().catch(e => console.log("自動再生ブロック:", e));
-            firstPlayer = false
-            playedAnsSound = false
+            playedAnsSound = false;
         } break;
 
         case "wrong": {
+
+            console.log("wrongSoundPlayed")
+
             wrongSound.currentTime = 0;
             wrongSound.play().catch(e => console.log("自動再生ブロック:", e));
-            firstPlayer = false
-            playedAnsSound = false
+            playedAnsSound = false;
         } break;
         
     }
