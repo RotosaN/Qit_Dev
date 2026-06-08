@@ -558,6 +558,7 @@ window.addEventListener('keydown', (event) => {
             console.log("played")
             ansSound.currentTime = 0;
             ansSound.play();
+            firstPlayer = true;
             playedAnsSound = true;
         }
 
