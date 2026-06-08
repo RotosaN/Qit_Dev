@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js"
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js"
-import { getDatabase, ref, set, onValue, get, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js"
+import { getDatabase, ref, set, onValue, get, update, serverTimestamp, onDisconnect } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js"
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -145,6 +145,7 @@ const ansSound = new Audio("sound/ans.mp3")
 const correctSound = new Audio("sound/correct.mp3")
 const wrongSound = new Audio("sound/wrong.mp3")
 
+let firstPlayer = false
 
 function initRuleUI() {
     const ruleSelect = document.getElementById("ruleSelect");
@@ -515,6 +516,7 @@ function getOrdinal(n) {
 
 let currentPlayersData = {};
 
+
 onValue(ref(db, `rooms/${roomId}/player`), (snapshot) => {
     const playersData = snapshot.val();
     if (!playersData) return;
@@ -529,6 +531,7 @@ onValue(ref(db, `rooms/${roomId}/player`), (snapshot) => {
             ansSound.currentTime = 0;
             ansSound.play();
             playedAnsSound = true;
+            firstPlayer = true;
         }
     } else {
         playedAnsSound = false;
@@ -546,8 +549,17 @@ window.addEventListener('keydown', (event) => {
     }
 
     if (event.key === 'Enter' && event.target.tagName !== 'INPUT') {
+        console.log("played1")
         if (isSubmitting) return;
+        console.log("played2")
         isSubmitting = true;
+
+        if(!firstPlayer){
+            console.log("played")
+            ansSound.currentTime = 0;
+            ansSound.play();
+            playedAnsSound = true;
+        }
 
         const playerRef = ref(db, `rooms/${roomId}/player/${myId}`);
         update(playerRef, {
@@ -585,20 +597,49 @@ $(document).on("click", ".correctButton, .wrongButton, .throughButton, .resetBut
         targetPlayerId: activePlayerId || "none",
         timestamp: Date.now(),
     }).then(() => {
-        switch (actionType) {
-            case "correct": {
-                correctSound.currentTime = 0;
-                correctSound.play()
-            } break
+        // switch (actionType) {
+        //     case "correct": {
+        //         correctSound.currentTime = 0;
+        //         correctSound.play()
+        //     } break
 
-            case "wrong": {
-                wrongSound.currentTime = 0;
-                wrongSound.play()
-            } break
-        }
+        //     case "wrong": {
+        //         wrongSound.currentTime = 0;
+        //         wrongSound.play()
+        //     } break
+        // }
     }).catch((error) => {
         console.error("ホスト権限がありません:", error);
     });
+});
+
+const hostActionRef = ref(db, `rooms/${roomId}/hostAction`);
+let lastSoundTimestamp = 0;
+onValue(hostActionRef, (snapshot) => {
+    const data = snapshot.val();
+    if (!data) return;
+
+    if (!data.timestamp || data.timestamp <= lastSoundTimestamp) {
+        if (data.timestamp) lastSoundTimestamp = data.timestamp;
+        return;
+    }
+    
+    lastSoundTimestamp = data.timestamp;
+
+    switch (data.action) {
+        case "correct": {
+            correctSound.currentTime = 0;
+            correctSound.play().catch(e => console.log("自動再生ブロック:", e));
+            firstPlayer = false
+        } break;
+
+        case "wrong": {
+            wrongSound.currentTime = 0;
+            wrongSound.play().catch(e => console.log("自動再生ブロック:", e));
+            firstPlayer = false
+        } break;
+        
+    }
 });
 
 document.getElementById("csvFileInput").addEventListener("change", function (event) {
