@@ -181,13 +181,12 @@ function initRuleUI() {
         ruleSelect.classList.toggle("open");
     });
 
-    if (gameRules.length > 2) {
-        const defaultOption = ruleOptionsContainer.children[2];
-        if (defaultOption) {
-            defaultOption.classList.add("selectedOption");
-            selectRule(gameRules[2]);
-        }
+    const defaultOption = ruleOptionsContainer.children[2];
+    if (defaultOption) {
+        defaultOption.classList.add("selectedOption");
+        selectRule(gameRules[0]);
     }
+
 }
 
 $('#checkFreeze').on('change', function () {
