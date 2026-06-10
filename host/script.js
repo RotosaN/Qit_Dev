@@ -348,7 +348,7 @@ function copy() {
 let playedAnsSound = false;
 let lastPlayedActionId = "";
 
-$('#submit').click(function() {
+$('#ruleSubmit').click(function() {
     console.log('ルール適用ボタンがクリックされました！');
 
     if (!isHost) {
@@ -420,6 +420,16 @@ $(window).on('load', function() {
         }
     });
 });
+
+
+$('#toggleSettingsBtn').click(function() {
+    console.log("open")
+    if($("#settingsScreen").hasClass("open")){
+        $("#settingsScreen").removeClass("open")
+    }else{
+        $("#settingsScreen").addClass("open")
+    }
+})
 
 function setPlayerData(playersData) {
     const mainObjContainer = document.querySelector('.mainObj');
@@ -722,21 +732,6 @@ $(document).ready(function () {
             $(targetSelector).show();
         } else {
             $(targetSelector).hide();
-        }
-    });
-});
-
-$(document).ready(function() {
-
-
-    $("#toggleSettingsBtn").on("click", function(e) {
-        e.stopPropagation();
-        $("#settingsScreen").toggleClass("open");
-    });
-
-    $(document).on("click", function(e) {
-        if (!$(e.target).closest("#settingsScreen").length) {
-            $("#settingsScreen").removeClass("open");
         }
     });
 });
