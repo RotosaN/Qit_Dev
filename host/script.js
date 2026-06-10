@@ -341,8 +341,7 @@ entrySubmitBtn.addEventListener("click", () => {
 })
 
 function copy() {
-    const targetCode = document.getElementById("roomidText")
-    navigator.clipboard.writeText(targetCode.textContent)
+    console.log("a")
 }
 
 let playedAnsSound = false;
@@ -781,6 +780,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     loadingScreen.classList.add('loaded');
                 }, 300);
             });
+
 
             if (document.readyState === 'complete') {
                 setTimeout(() => {
