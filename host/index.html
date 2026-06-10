@@ -43,6 +43,19 @@
 </head>
 
 <body>
+
+    <div id="loading">
+        <div id="loading-container">
+            <div class="loading-logo">
+                <img src="img/grayButton.png" class="logo-img">
+            </div>
+
+            <div class="progress-bar-container">
+                <div id="progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
     <div id="nameInputModal" class="modalOverlay">
         <div class="modalContent">
             <h3>ENTRY</h3>
@@ -182,7 +195,8 @@
                     </div>
 
                     <p class="configLabel">ゲームルール <span class="settingLabelEng">GAME RULE</span>
-                        <button id="ruleSubmit">ルール適用</button></p>
+                        <button id="ruleSubmit">ルール適用</button>
+                    </p>
                     <div class="customSelect" id="ruleSelect">
                         <div class="selected" id="selectedRuleName">ルールの選択</div>
                         <div class="options" id="ruleOptions">

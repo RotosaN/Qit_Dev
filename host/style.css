@@ -21,6 +21,80 @@ body {
     src: url('../media/font/GenInterfaceJP-Bold.woff') format('woff');
 }
 
+#loading,
+#loading * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: sans-serif;
+}
+
+#loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #ffffff;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+#loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 80%;
+    max-width: 300px;
+}
+
+.loading-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 200px;
+    opacity: 0.3;
+}
+
+.logo-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 6px;
+    background-color: #c9c9c9;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+#progress-bar {
+    width: 0%;
+    height: 100%;
+    background-color: #7b7b7b;
+    transition: width 0.1s linear;
+}
+
+#progress-text {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.loaded {
+    opacity: 0;
+    visibility: hidden;
+}
+
 .noQ {
     display: none;
     font-family: "GenMid";
@@ -316,13 +390,13 @@ body {
 
     background-color: #f2f2f2;
     border: 0px solid #000000;
-    border-right: none; 
+    border-right: none;
     border-radius: 12px 0 0 12px;
-    
+
     display: flex;
     justify-content: center;
     align-items: center;
-    
+
     cursor: pointer;
     color: #555;
 }
@@ -338,9 +412,10 @@ body {
     transition: all 0.2s;
 }
 
-#settingsScreen.open{
+#settingsScreen.open {
     right: 0px;
 }
+
 #ruleSubmit {
     color: #ffffff;
     background: #212121;
@@ -351,6 +426,7 @@ body {
     margin-left: 20px;
     cursor: pointer;
 }
+
 #settingTitle {
     color: #212121;
     font-family: futura-pt-condensed, sans-serif;

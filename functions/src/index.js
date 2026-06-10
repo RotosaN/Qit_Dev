@@ -5,8 +5,11 @@ admin.initializeApp();
 
 exports.checkBuzzer = onValueUpdated({
     region: "asia-southeast1",
-    ref: "/rooms/{roomId}/player/{playerId}"
-}, async (event) => {
+    ref: "/rooms/{roomId}/player/{playerId}",
+    minInstances: 1,
+    memory: "128MiB",
+    cpu: 0.08 
+}, async (event) =>{
     const db = admin.database();
     const { roomId, playerId } = event.params;
 

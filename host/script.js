@@ -34,8 +34,8 @@ const gameRules = [
         ruleOverView: "勝利条件なし、ポイントが記録されるルールです。",
         playerCard: "point",
         parameters: [
-            {id: "correctPoint", inputPosition: 3, text: "正解時ポイント", default: 1},
-            {id: "lostX", inputPosition: 3, text: "誤答時ポイント", default: -1},
+            { id: "correctPoint", inputPosition: 3, text: "正解時ポイント", default: 1 },
+            { id: "lostX", inputPosition: 3, text: "誤答時ポイント", default: -1 },
         ]
     },
     {
@@ -44,8 +44,8 @@ const gameRules = [
         ruleOverView: "N○に達したら勝ち抜け、M×に達すると失格する、基本的なルールです。",
         playerCard: "ox",
         parameters: [
-            {id: "wonO", inputPosition: "front", text: "○で勝ち抜け", default: 7 },
-            {id: "lostX", inputPosition: "front", text: "×で失格", default: 3 }
+            { id: "wonO", inputPosition: "front", text: "○で勝ち抜け", default: 7 },
+            { id: "lostX", inputPosition: "front", text: "×で失格", default: 3 }
         ]
     },
     {
@@ -54,9 +54,9 @@ const gameRules = [
         ruleOverView: "正解でNポイント加点、誤答でMポイント減点される、基本的なルールです。",
         playerCard: "point",
         parameters: [
-            {id: "correctPoint", inputPosition: 3, text: "正解時ポイント", default: 1},
-            {id: "lostX", inputPosition: 3, text: "誤答時ポイント", default: -1},
-            {id: "wonPoint", inputPosition: "front", text: "ポイントで勝ち抜け", default: 10}
+            { id: "correctPoint", inputPosition: 3, text: "正解時ポイント", default: 1 },
+            { id: "lostX", inputPosition: 3, text: "誤答時ポイント", default: -1 },
+            { id: "wonPoint", inputPosition: "front", text: "ポイントで勝ち抜け", default: 10 }
         ]
     },
     {
@@ -65,11 +65,11 @@ const gameRules = [
         ruleOverView: "正解で加点されるXに、誤答で減点されるYを乗じた数Zがスコアになるルールです。Yが0になると失格します。",
         playerCard: "xyz",
         parameters: [
-            {id: "startX", inputPosition: "back", text: "スタート時のX", default: 0},
-            {id: "startY", inputPosition: "back", text: "スタート時のY", default: 10},
-            {id: "correctX", inputPosition: 3, text: "正解時X", default: 1},
-            {id: "correctY", inputPosition: 3, text: "誤答時Y", default: -1},
-            {id: "winZ", inputPosition: 2, text: "Zがで以上で勝ち抜け", default: 100}
+            { id: "startX", inputPosition: "back", text: "スタート時のX", default: 0 },
+            { id: "startY", inputPosition: "back", text: "スタート時のY", default: 10 },
+            { id: "correctX", inputPosition: 3, text: "正解時X", default: 1 },
+            { id: "correctY", inputPosition: 3, text: "誤答時Y", default: -1 },
+            { id: "winZ", inputPosition: 2, text: "Zがで以上で勝ち抜け", default: 100 }
         ]
     },
     {
@@ -78,9 +78,9 @@ const gameRules = [
         ruleOverView: "正解を積み重ねるほど誤答時の×の数が増加するルールです。",
         playerCard: "ox",
         parameters: [
-            {id: "wonO", inputPosition: "front", text: "○で勝ち抜け", default: 10 },
-            {id: "lostX", inputPosition: "front", text: "×で勝ち抜け", default: 10 },
-            {id: "damage_", inputPosition: 3, text: "誤答時○以上で+1×", default: 1, type: "increasable"}
+            { id: "wonO", inputPosition: "front", text: "○で勝ち抜け", default: 10 },
+            { id: "lostX", inputPosition: "front", text: "×で勝ち抜け", default: 10 },
+            { id: "damage_", inputPosition: 3, text: "誤答時○以上で+1×", default: 1, type: "increasable" }
         ]
     },
     {
@@ -113,7 +113,7 @@ const gameRules = [
     {
         ruleName: "N Star",
         id: "nstar",
-        ruleOverView: "正解でNポイント、誤答で点数の一の位を切り捨て（一の位が0場合、-10ポイント。また、0ptの場合はフリーズ（お休み）状態になる）、スターを1つ削るルールです。スターが0個になったら失格します。",
+        ruleOverView: "正解でNポイント、誤答で点数の一の位を切り捨て（一の位が0場合、-10pt。また、0ptの場合はフリーズ（お休み）状態になる）、スターを1つ削るルールです。スターが0個になったら失格します。",
         playerCard: "point-star",
         parameters: [
             { id: "wonPoint", inputPosition: "front", text: "ポイントで勝ち抜け", default: 7 },
@@ -125,7 +125,7 @@ const gameRules = [
 ]
 
 signInAnonymously(auth)
-    .then(() => {})
+    .then(() => { })
     .catch((error) => {
         console.error("匿名ログインに失敗しました:", error);
     });
@@ -190,7 +190,7 @@ function initRuleUI() {
     }
 }
 
-$('#checkFreeze').on('change', function() {
+$('#checkFreeze').on('change', function () {
     if (!isHost) return;
     const isChecked = $(this).is(':checked');
 
@@ -264,26 +264,26 @@ onValue(ref(db, `rooms/${roomId}`), (snapshot) => {
     if (!isHost) {
         $("#settingsScreen").remove();
         $(".hostButtons").remove()
-    }else{
+    } else {
         $(".buttonObj").remove()
         $(".hostbutton").show()
     }
 
     const Qnum = roomData.nowQNum
 
-    if(!roomData.quizList || roomData.quizList.length == 0){
+    if (!roomData.quizList || roomData.quizList.length == 0) {
         $(".noQ").show();
         $(".question-box").hide();
-    }else{
+    } else {
         $(".noQ").hide();
         $(".question-box").show();
 
-        $("#totalQ").text(roomData.quizList.length-1)
+        $("#totalQ").text(roomData.quizList.length - 1)
 
-        if(Qnum == 0){
+        if (Qnum == 0) {
             $(".q0").show();
             $(".question-box").hide();
-        }else{
+        } else {
             $(".q0").hide();
             $(".question-box").show();
 
@@ -348,27 +348,27 @@ function copy() {
 let playedAnsSound = false;
 let lastPlayedActionId = "";
 
-$('#ruleSubmit').click(function() {
+$('#ruleSubmit').click(function () {
     console.log('ルール適用ボタンがクリックされました！');
 
     if (!isHost) {
         return;
     }
 
-    const currentRuleId = $('.selectedOption').data('value'); 
-    
+    const currentRuleId = $('.selectedOption').data('value');
+
     if (!currentRuleId) {
         alert("ルールが選択されていません。");
         return;
     }
 
     const ruleParameters = {};
-    
-    $('#parametersContainer .inputGameruleValue').each(function() {
+
+    $('#parametersContainer .inputGameruleValue').each(function () {
         const fullId = $(this).attr('id');
         const paramKey = fullId.replace('input_', '');
         const paramValue = Number($(this).val());
-        
+
         ruleParameters[paramKey] = paramValue;
     });
 
@@ -378,7 +378,7 @@ $('#ruleSubmit').click(function() {
     };
 
     const roomRef = ref(db, `rooms/${roomId}/roomRule`);
-    
+
     update(roomRef, updateData)
         .then(() => {
             console.log('Firebaseへのルール適用が成功しました！', updateData);
@@ -390,8 +390,8 @@ $('#ruleSubmit').click(function() {
         });
 });
 
-$(window).on('load', function() {
-    
+$(window).on('load', function () {
+
     const buzzerObject = document.querySelector('.buzzerBtn');
     if (!buzzerObject) return;
 
@@ -404,8 +404,9 @@ $(window).on('load', function() {
     let isKeyPressed = false;
 
 
-    $(window).on('keydown', function(e) {
+    $(window).on('keydown', function (e) {
         if (e.originalEvent.repeat) return;
+
 
         if (e.key === ' ' || e.key === 'Enter') {
             isKeyPressed = true;
@@ -413,7 +414,7 @@ $(window).on('load', function() {
         }
     });
 
-    $(window).on('keyup', function(e) {
+    $(window).on('keyup', function (e) {
         if (e.key === ' ' || e.key === 'Enter') {
             isKeyPressed = false;
             svgButton.classList.remove('push');
@@ -422,11 +423,11 @@ $(window).on('load', function() {
 });
 
 
-$('#toggleSettingsBtn').click(function() {
+$('#toggleSettingsBtn').click(function () {
     console.log("open")
-    if($("#settingsScreen").hasClass("open")){
+    if ($("#settingsScreen").hasClass("open")) {
         $("#settingsScreen").removeClass("open")
-    }else{
+    } else {
         $("#settingsScreen").addClass("open")
     }
 })
@@ -457,11 +458,11 @@ function setPlayerData(playersData) {
     });
 }
 
-$('#parametersContainer').on('change', '.inputGameruleValue', function(e) {
+$('#parametersContainer').on('change', '.inputGameruleValue', function (e) {
 
-    const hasId = this.id.replace("input_","")
+    const hasId = this.id.replace("input_", "")
 
-    
+
 });
 
 
@@ -529,7 +530,7 @@ let currentPlayersData = {};
 window.addEventListener('keydown', (event) => {
     const myId = localStorage.getItem("qitPlayerUUID");
     if (!myId || !currentPlayersData[myId]) return;
-
+    if (event.repeat) return;
     if (currentPlayersData[myId].rank !== 0) return;
 
     if (event.key === 'Enter' && event.target.tagName !== 'INPUT') {
@@ -547,14 +548,14 @@ window.addEventListener('keydown', (event) => {
             isPushing: true,
             pushedAt: serverTimestamp()
         }).then(() => {
-            setTimeout(() => { isSubmitting = false; }, 200); 
+            setTimeout(() => { isSubmitting = false; }, 200);
         }).catch(() => {
             isSubmitting = false;
         });
     }
 });
 
-let currentHostAction = "idle"; 
+let currentHostAction = "idle";
 
 onValue(ref(db, `rooms/${roomId}/player`), (snapshot) => {
     const playersData = snapshot.val();
@@ -564,18 +565,18 @@ onValue(ref(db, `rooms/${roomId}/player`), (snapshot) => {
     setPlayerData(playersData);
 
     const myId = localStorage.getItem("qitPlayerUUID");
-    
+
     const activePlayerId = Object.keys(playersData).find(
         id => playersData[id] && playersData[id].rank === 1
     );
 
     if (currentHostAction !== "idle" && currentHostAction !== "reset") {
-        return; 
+        return;
     }
 
     if (!activePlayerId) {
         if (playedAnsSound !== "") {
-            playedAnsSound = ""; 
+            playedAnsSound = "";
         }
         return;
     }
@@ -583,13 +584,13 @@ onValue(ref(db, `rooms/${roomId}/player`), (snapshot) => {
     const activePlayer = playersData[activePlayerId];
 
     if (activePlayer && activePlayer.isPushing === true) {
-        
+
         if (activePlayerId !== myId && playedAnsSound === "") {
             console.log("他人が押した音を再生します");
             ansSound.currentTime = 0;
             ansSound.play().catch(e => console.log("自動再生ブロック:", e));
-            
-            playedAnsSound = activePlayerId; 
+
+            playedAnsSound = activePlayerId;
         }
     }
 });
@@ -649,7 +650,7 @@ onValue(hostActionRef, (snapshot) => {
         if (data.timestamp) lastSoundTimestamp = data.timestamp;
         return;
     }
-    
+
     lastSoundTimestamp = data.timestamp;
 
     switch (data.action) {
@@ -657,14 +658,14 @@ onValue(hostActionRef, (snapshot) => {
             console.log("correctSoundPlayed");
             correctSound.currentTime = 0;
             correctSound.play().catch(e => console.log("自動再生ブロック:", e));
-            playedAnsSound = ""; 
+            playedAnsSound = "";
         } break;
 
         case "wrong": {
             console.log("wrongSoundPlayed");
             wrongSound.currentTime = 0;
             wrongSound.play().catch(e => console.log("自動再生ブロック:", e));
-            playedAnsSound = ""; 
+            playedAnsSound = "";
         } break;
     }
 });
@@ -734,4 +735,58 @@ $(document).ready(function () {
             $(targetSelector).hide();
         }
     });
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+    const progressBar = document.getElementById('progress-bar');
+    const loadingScreen = document.getElementById('loading');
+
+    const images = document.querySelectorAll('img');
+    const totalImages = images.length;
+
+    let loadedCount = 0;
+    let currentPercent = 0;
+    let targetPercent = 0;
+
+    if (totalImages === 0) {
+        targetPercent = 100;
+    } else {
+        images.forEach((img) => {
+            if (img.complete) {
+                updateProgress();
+            } else {
+                img.addEventListener('load', updateProgress);
+                img.addEventListener('error', updateProgress);
+            }
+        });
+    }
+
+    function updateProgress() {
+        loadedCount++;
+        targetPercent = Math.floor((loadedCount / totalImages) * 100);
+    }
+
+    const progressInterval = setInterval(() => {
+        if (currentPercent < targetPercent) {
+            currentPercent++;
+
+            progressBar.style.width = `${currentPercent}%`;
+        }
+
+        if (currentPercent >= 100) {
+            clearInterval(progressInterval);
+
+            window.addEventListener('load', () => {
+                setTimeout(() => {
+                    loadingScreen.classList.add('loaded');
+                }, 300);
+            });
+
+            if (document.readyState === 'complete') {
+                setTimeout(() => {
+                    loadingScreen.classList.add('loaded');
+                }, 300);
+            }
+        }
+    }, 0);
 });
